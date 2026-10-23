@@ -1,0 +1,263 @@
+// Prisma Schema for Sokher Store
+// Full E-commerce with Shared Backend Database
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User & Authentication (Server-side, bcrypt hash, httpOnly session)
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  phone     String?
+  password  String
+  role      String   @default("CUSTOMER") // "ADMIN" or "CUSTOMER"
+  addresses String?  // JSON stringified address list
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orders    Order[]
+  reviews   Review[]
+  wishlists WishlistItem[]
+}
+
+// Categories (Full CRUD with image, auto & unique slug, soft reassign on delete)
+model Category {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  image       String?
+  description String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  subcategories     Subcategory[]
+  productCategories ProductCategory[]
+}
+
+// Subcategories (Belongs to a Category)
+model Subcategory {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  products Product[]
+}
+
+// Products (Dynamic, Multi-Category, Unique SKU, Variant support, SEO, AI description)
+model Product {
+  id              String   @id @default(cuid())
+  name            String
+  slug            String   @unique
+  sku             String   @unique
+  price           Float
+  regularPrice    Float?
+  stock           Int      @default(0)
+  badge           String?  // e.g. "Best Seller", "New", "Hot"
+  isFeatured      Boolean  @default(false)
+  status          String   @default("ACTIVE") // "ACTIVE" or "DRAFT"
+  images          String   // JSON string of image URLs
+  description     String?
+  specification   String?  // JSON string of key-value specs
+  variants        String?  // JSON string of variants (shades, sizes)
+  viewCount       Int      @default(0)
+  seoTitle        String?
+  seoDescription  String?
+  subcategoryId   String?
+  subcategory     Subcategory? @relation(fields: [subcategoryId], references: [id], onDelete: SetNull)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  categories      ProductCategory[]
+  orderItems      OrderItem[]
+  reviews         Review[]
+  wishlists       WishlistItem[]
+  flashSaleItems  FlashSaleItem[]
+}
+
+// Many-to-Many Join: Products can belong to multiple categories
+model ProductCategory {
+  productId  String
+  categoryId String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([productId, categoryId])
+}
+
+// Orders (With snapshot of products, payment verification, idempotent cancel stock return)
+model Order {
+  id              String      @id @default(cuid())
+  orderNumber     String      @unique
+  userId          String?
+  user            User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  customerName    String
+  customerPhone   String
+  customerEmail   String?
+  shippingAddress String
+  deliveryZone    String      // "DHAKA", "DHAKA_SUBURB", "OUTSIDE_DHAKA"
+  orderNotes      String?
+  subtotal        Float
+  deliveryCharge  Float
+  discountAmount  Float       @default(0)
+  totalAmount     Float
+  paymentMethod   String      // "COD", "BKASH", "NAGAD"
+  paymentStatus   String      @default("PENDING") // "PENDING", "PAID", "REJECTED"
+  senderNumber    String?
+  trxId           String?
+  orderStatus     String      @default("PENDING") // "PENDING", "CONFIRMED", "PACKED", "SHIPPED", "DELIVERED", "CANCELLED"
+  isStockRestored Boolean     @default(false)     // Critical rule #7: Idempotent stock restoration on cancel
+  couponCode      String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  items OrderItem[]
+}
+
+// Order Items (Snapshot of real product at time of purchase)
+model OrderItem {
+  id           String   @id @default(cuid())
+  orderId      String
+  order        Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId    String?
+  product      Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  productName  String   // Snapshot of actual name (no generic "Product Item")
+  productSku   String?  // Snapshot of SKU
+  productImage String?  // Snapshot of primary image
+  variant      String?  // Selected variant snapshot (e.g. "Shade 128")
+  unitPrice    Float    // Price at the time of purchase
+  quantity     Int
+  lineTotal    Float
+}
+
+// Coupons
+model Coupon {
+  id             String    @id @default(cuid())
+  code           String    @unique
+  discountType   String    // "PERCENTAGE" or "FIXED"
+  discountValue  Float
+  minOrderAmount Float?
+  maxDiscountCap Float?
+  expiryDate     DateTime?
+  usageLimit     Int?
+  usageCount     Int       @default(0)
+  isActive       Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+// Customer Reviews & Ratings
+model Review {
+  id           String   @id @default(cuid())
+  productId    String
+  product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId       String?
+  user         User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  customerName String
+  rating       Int      // 1 to 5
+  comment      String
+  isVerified   Boolean  @default(false)
+  status       String   @default("APPROVED") // "APPROVED", "PENDING", "REJECTED"
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// Wishlist
+model WishlistItem {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+}
+
+// Sliders & Banners (Hero slides, promo banners - fully admin controlled)
+model Banner {
+  id         String   @id @default(cuid())
+  type       String   // "HERO_SLIDER" or "PROMO_BANNER"
+  title      String?
+  subtitle   String?
+  badge      String?
+  buttonText String?
+  buttonUrl  String?
+  imageUrl   String
+  order      Int      @default(0)
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// Flash Sale Deals (with start, end date & auto expiration)
+model FlashSale {
+  id        String          @id @default(cuid())
+  title     String
+  startTime DateTime
+  endTime   DateTime
+  isActive  Boolean         @default(true)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  items FlashSaleItem[]
+}
+
+model FlashSaleItem {
+  id          String    @id @default(cuid())
+  flashSaleId String
+  flashSale   FlashSale @relation(fields: [flashSaleId], references: [id], onDelete: Cascade)
+  productId   String
+  product     Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  salePrice   Float
+  stockLimit  Int?
+
+  @@unique([flashSaleId, productId])
+}
+
+// Store Settings (Single source of truth for Delivery, Store info, Social, Tracking)
+model StoreSetting {
+  id                     String   @id @default("default")
+  storeName              String   @default("Sokher Store")
+  tagline                String?  @default("Your Beauty, Our Passion")
+  logoUrl                String?  @default("/images/logo-icon.jpg")
+  faviconUrl             String?
+  primaryColor           String?  @default("#e11d2e")
+  announcementText       String?  @default("Free Shipping on orders over ৳999 | 100% Authentic Products")
+  isAnnouncementActive   Boolean  @default(true)
+  contactPhone           String?  @default("+880 1700-000000")
+  contactEmail           String?  @default("support@sokherstore.com")
+  contactAddress         String?  @default("Dhaka, Bangladesh")
+  whatsappNumber         String?  @default("+880 1700-000000")
+  facebookUrl            String?
+  instagramUrl           String?
+  youtubeUrl             String?
+  tiktokUrl              String?
+  // Delivery Charge Config (Single Source of Truth)
+  deliveryDhaka          Float    @default(70)
+  deliveryDhakaSuburbs   Float    @default(100)
+  deliveryOutsideDhaka   Float    @default(130)
+  freeDeliveryThreshold  Float    @default(999)
+  // Payment Accounts (Masked in UI)
+  bkashNumber            String?  @default("01700000000")
+  nagadNumber            String?  @default("01800000000")
+  // Tracking
+  metaPixelId            String?
+  metaCapiToken          String?
+  ga4MeasurementId       String?
+  gtmContainerId         String?
+  // Trust bar items (JSON string of { icon, title, subtitle })
+  trustBarItems          String?
+  updatedAt              DateTime @updatedAt
+}

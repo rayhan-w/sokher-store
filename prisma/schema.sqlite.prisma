@@ -1,0 +1,244 @@
+// Prisma SQLite Schema for Sokher Store (Local Zero-Config Offline Mode)
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  phone     String?
+  password  String
+  role      String   @default("CUSTOMER")
+  addresses String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orders    Order[]
+  reviews   Review[]
+  wishlists WishlistItem[]
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  image       String?
+  description String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  subcategories     Subcategory[]
+  productCategories ProductCategory[]
+}
+
+model Subcategory {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  products Product[]
+}
+
+model Product {
+  id              String   @id @default(cuid())
+  name            String
+  slug            String   @unique
+  sku             String   @unique
+  price           Float
+  regularPrice    Float?
+  stock           Int      @default(0)
+  badge           String?
+  isFeatured      Boolean  @default(false)
+  status          String   @default("ACTIVE")
+  images          String
+  description     String?
+  specification   String?
+  variants        String?
+  viewCount       Int      @default(0)
+  seoTitle        String?
+  seoDescription  String?
+  subcategoryId   String?
+  subcategory     Subcategory? @relation(fields: [subcategoryId], references: [id], onDelete: SetNull)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  categories      ProductCategory[]
+  orderItems      OrderItem[]
+  reviews         Review[]
+  wishlists       WishlistItem[]
+  flashSaleItems  FlashSaleItem[]
+}
+
+model ProductCategory {
+  productId  String
+  categoryId String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([productId, categoryId])
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  orderNumber     String      @unique
+  userId          String?
+  user            User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  customerName    String
+  customerPhone   String
+  customerEmail   String?
+  shippingAddress String
+  deliveryZone    String
+  orderNotes      String?
+  subtotal        Float
+  deliveryCharge  Float
+  discountAmount  Float       @default(0)
+  totalAmount     Float
+  paymentMethod   String
+  paymentStatus   String      @default("PENDING")
+  senderNumber    String?
+  trxId           String?
+  orderStatus     String      @default("PENDING")
+  isStockRestored Boolean     @default(false)
+  couponCode      String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  items OrderItem[]
+}
+
+model OrderItem {
+  id           String   @id @default(cuid())
+  orderId      String
+  order        Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId    String?
+  product      Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  productName  String
+  productSku   String?
+  productImage String?
+  variant      String?
+  unitPrice    Float
+  quantity     Int
+  lineTotal    Float
+}
+
+model Coupon {
+  id             String    @id @default(cuid())
+  code           String    @unique
+  discountType   String
+  discountValue  Float
+  minOrderAmount Float?
+  maxDiscountCap Float?
+  expiryDate     DateTime?
+  usageLimit     Int?
+  usageCount     Int       @default(0)
+  isActive       Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model Review {
+  id           String   @id @default(cuid())
+  productId    String
+  product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId       String?
+  user         User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  customerName String
+  rating       Int
+  comment      String
+  isVerified   Boolean  @default(false)
+  status       String   @default("APPROVED")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model WishlistItem {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+}
+
+model Banner {
+  id         String   @id @default(cuid())
+  type       String
+  title      String?
+  subtitle   String?
+  badge      String?
+  buttonText String?
+  buttonUrl  String?
+  imageUrl   String
+  order      Int      @default(0)
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model FlashSale {
+  id        String          @id @default(cuid())
+  title     String
+  startTime DateTime
+  endTime   DateTime
+  isActive  Boolean         @default(true)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  items FlashSaleItem[]
+}
+
+model FlashSaleItem {
+  id          String    @id @default(cuid())
+  flashSaleId String
+  flashSale   FlashSale @relation(fields: [flashSaleId], references: [id], onDelete: Cascade)
+  productId   String
+  product     Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  salePrice   Float
+  stockLimit  Int?
+
+  @@unique([flashSaleId, productId])
+}
+
+model StoreSetting {
+  id                     String   @id @default("default")
+  storeName              String   @default("Sokher Store")
+  tagline                String?  @default("Your Beauty, Our Passion")
+  logoUrl                String?  @default("/images/logo-icon.jpg")
+  faviconUrl             String?
+  primaryColor           String?  @default("#e11d2e")
+  announcementText       String?  @default("Free Shipping on orders over ৳999 | 100% Authentic Products")
+  isAnnouncementActive   Boolean  @default(true)
+  contactPhone           String?  @default("+880 1700-000000")
+  contactEmail           String?  @default("support@sokherstore.com")
+  contactAddress         String?  @default("Dhaka, Bangladesh")
+  whatsappNumber         String?  @default("+880 1700-000000")
+  facebookUrl            String?
+  instagramUrl           String?
+  youtubeUrl             String?
+  tiktokUrl              String?
+  deliveryDhaka          Float    @default(70)
+  deliveryDhakaSuburbs   Float    @default(100)
+  deliveryOutsideDhaka   Float    @default(130)
+  freeDeliveryThreshold  Float    @default(999)
+  bkashNumber            String?  @default("01700000000")
+  nagadNumber            String?  @default("01800000000")
+  metaPixelId            String?
+  metaCapiToken          String?
+  ga4MeasurementId       String?
+  gtmContainerId         String?
+  trustBarItems          String?
+  updatedAt              DateTime @updatedAt
+}
