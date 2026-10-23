@@ -23,9 +23,8 @@ yarn-error.log*
 pnpm-debug.log*
 
 # Local SQLite databases
-*.db
 *.db-journal
-dev.db
+
 
 # Editor & OS files
 .vscode/

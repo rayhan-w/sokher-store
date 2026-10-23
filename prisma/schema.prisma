@@ -1,24 +1,21 @@
-// Prisma Schema for Sokher Store
-// Full E-commerce with Shared Backend Database
-
+// Prisma SQLite Schema for Sokher Store (Local Zero-Config Offline Mode)
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
-// User & Authentication (Server-side, bcrypt hash, httpOnly session)
 model User {
   id        String   @id @default(cuid())
   name      String
   email     String   @unique
   phone     String?
   password  String
-  role      String   @default("CUSTOMER") // "ADMIN" or "CUSTOMER"
-  addresses String?  // JSON stringified address list
+  role      String   @default("CUSTOMER")
+  addresses String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -27,7 +24,6 @@ model User {
   wishlists WishlistItem[]
 }
 
-// Categories (Full CRUD with image, auto & unique slug, soft reassign on delete)
 model Category {
   id          String   @id @default(cuid())
   name        String
@@ -42,7 +38,6 @@ model Category {
   productCategories ProductCategory[]
 }
 
-// Subcategories (Belongs to a Category)
 model Subcategory {
   id          String   @id @default(cuid())
   name        String
@@ -55,7 +50,6 @@ model Subcategory {
   products Product[]
 }
 
-// Products (Dynamic, Multi-Category, Unique SKU, Variant support, SEO, AI description)
 model Product {
   id              String   @id @default(cuid())
   name            String
@@ -64,13 +58,13 @@ model Product {
   price           Float
   regularPrice    Float?
   stock           Int      @default(0)
-  badge           String?  // e.g. "Best Seller", "New", "Hot"
+  badge           String?
   isFeatured      Boolean  @default(false)
-  status          String   @default("ACTIVE") // "ACTIVE" or "DRAFT"
-  images          String   // JSON string of image URLs
+  status          String   @default("ACTIVE")
+  images          String
   description     String?
-  specification   String?  // JSON string of key-value specs
-  variants        String?  // JSON string of variants (shades, sizes)
+  specification   String?
+  variants        String?
   viewCount       Int      @default(0)
   seoTitle        String?
   seoDescription  String?
@@ -86,7 +80,6 @@ model Product {
   flashSaleItems  FlashSaleItem[]
 }
 
-// Many-to-Many Join: Products can belong to multiple categories
 model ProductCategory {
   productId  String
   categoryId String
@@ -96,7 +89,6 @@ model ProductCategory {
   @@id([productId, categoryId])
 }
 
-// Orders (With snapshot of products, payment verification, idempotent cancel stock return)
 model Order {
   id              String      @id @default(cuid())
   orderNumber     String      @unique
@@ -106,18 +98,18 @@ model Order {
   customerPhone   String
   customerEmail   String?
   shippingAddress String
-  deliveryZone    String      // "DHAKA", "DHAKA_SUBURB", "OUTSIDE_DHAKA"
+  deliveryZone    String
   orderNotes      String?
   subtotal        Float
   deliveryCharge  Float
   discountAmount  Float       @default(0)
   totalAmount     Float
-  paymentMethod   String      // "COD", "BKASH", "NAGAD"
-  paymentStatus   String      @default("PENDING") // "PENDING", "PAID", "REJECTED"
+  paymentMethod   String
+  paymentStatus   String      @default("PENDING")
   senderNumber    String?
   trxId           String?
-  orderStatus     String      @default("PENDING") // "PENDING", "CONFIRMED", "PACKED", "SHIPPED", "DELIVERED", "CANCELLED"
-  isStockRestored Boolean     @default(false)     // Critical rule #7: Idempotent stock restoration on cancel
+  orderStatus     String      @default("PENDING")
+  isStockRestored Boolean     @default(false)
   couponCode      String?
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
@@ -125,27 +117,25 @@ model Order {
   items OrderItem[]
 }
 
-// Order Items (Snapshot of real product at time of purchase)
 model OrderItem {
   id           String   @id @default(cuid())
   orderId      String
   order        Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
   productId    String?
   product      Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
-  productName  String   // Snapshot of actual name (no generic "Product Item")
-  productSku   String?  // Snapshot of SKU
-  productImage String?  // Snapshot of primary image
-  variant      String?  // Selected variant snapshot (e.g. "Shade 128")
-  unitPrice    Float    // Price at the time of purchase
+  productName  String
+  productSku   String?
+  productImage String?
+  variant      String?
+  unitPrice    Float
   quantity     Int
   lineTotal    Float
 }
 
-// Coupons
 model Coupon {
   id             String    @id @default(cuid())
   code           String    @unique
-  discountType   String    // "PERCENTAGE" or "FIXED"
+  discountType   String
   discountValue  Float
   minOrderAmount Float?
   maxDiscountCap Float?
@@ -157,7 +147,6 @@ model Coupon {
   updatedAt      DateTime  @updatedAt
 }
 
-// Customer Reviews & Ratings
 model Review {
   id           String   @id @default(cuid())
   productId    String
@@ -165,15 +154,14 @@ model Review {
   userId       String?
   user         User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
   customerName String
-  rating       Int      // 1 to 5
+  rating       Int
   comment      String
   isVerified   Boolean  @default(false)
-  status       String   @default("APPROVED") // "APPROVED", "PENDING", "REJECTED"
+  status       String   @default("APPROVED")
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
 
-// Wishlist
 model WishlistItem {
   id        String   @id @default(cuid())
   userId    String
@@ -185,10 +173,9 @@ model WishlistItem {
   @@unique([userId, productId])
 }
 
-// Sliders & Banners (Hero slides, promo banners - fully admin controlled)
 model Banner {
   id         String   @id @default(cuid())
-  type       String   // "HERO_SLIDER" or "PROMO_BANNER"
+  type       String
   title      String?
   subtitle   String?
   badge      String?
@@ -201,7 +188,6 @@ model Banner {
   updatedAt  DateTime @updatedAt
 }
 
-// Flash Sale Deals (with start, end date & auto expiration)
 model FlashSale {
   id        String          @id @default(cuid())
   title     String
@@ -226,7 +212,6 @@ model FlashSaleItem {
   @@unique([flashSaleId, productId])
 }
 
-// Store Settings (Single source of truth for Delivery, Store info, Social, Tracking)
 model StoreSetting {
   id                     String   @id @default("default")
   storeName              String   @default("Sokher Store")
@@ -244,20 +229,16 @@ model StoreSetting {
   instagramUrl           String?
   youtubeUrl             String?
   tiktokUrl              String?
-  // Delivery Charge Config (Single Source of Truth)
   deliveryDhaka          Float    @default(70)
   deliveryDhakaSuburbs   Float    @default(100)
   deliveryOutsideDhaka   Float    @default(130)
   freeDeliveryThreshold  Float    @default(999)
-  // Payment Accounts (Masked in UI)
   bkashNumber            String?  @default("01700000000")
   nagadNumber            String?  @default("01800000000")
-  // Tracking
   metaPixelId            String?
   metaCapiToken          String?
   ga4MeasurementId       String?
   gtmContainerId         String?
-  // Trust bar items (JSON string of { icon, title, subtitle })
   trustBarItems          String?
   updatedAt              DateTime @updatedAt
 }
