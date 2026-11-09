@@ -120,9 +120,12 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   }
 
   if (badge) {
-    if (badge === 'FLASH_SALE' || badge === 'OFFER' || badge === 'DISCOUNT') {
+    if (badge === 'FLASH_SALE' || badge === 'OFFER' || badge === 'DISCOUNT' || badge === 'flash-sale') {
       conditions.push({
-        regularPrice: { not: null },
+        OR: [
+          { badge: { in: ['FLASH_SALE', 'FLASH SALE', 'Flash Sale', 'OFFER', 'Offer', 'SALE', 'Sale', 'Special Offer'] } },
+          { flashSaleItems: { some: { flashSale: { isActive: true } } } },
+        ],
       });
     } else {
       conditions.push({
@@ -132,18 +135,17 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   }
 
   if (flags.length > 0) {
-    const flagConditions: any[] = [];
+    const allowedBadges: string[] = [];
     if (flags.includes('Best Selling')) {
-      flagConditions.push(
-        { badge: { in: ['Best Selling', 'Best Seller', 'HOT'] } },
-        { isFeatured: true }
-      );
+      allowedBadges.push('Best Selling', 'Best Seller');
     }
     if (flags.includes('New Arrival')) {
-      flagConditions.push({ badge: { in: ['New Arrival', 'New', 'NEW_ARRIVAL'] } });
+      allowedBadges.push('New Arrival', 'New', 'NEW_ARRIVAL');
     }
-    if (flagConditions.length > 0) {
-      conditions.push({ OR: flagConditions });
+    if (allowedBadges.length > 0) {
+      conditions.push({
+        badge: { in: allowedBadges },
+      });
     }
   }
 
@@ -234,13 +236,15 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
       <Header settings={defaultSettings as any} categories={formattedCategories} />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1 w-full">
-        {/* Breadcrumb: Home > Shop */}
+        {/* Breadcrumb: Home > Shop (or Home > Offer Zone) */}
         <nav className="text-xs text-gray-500 mb-6 flex items-center gap-2">
           <Link href="/" className="hover:text-[#cc272d] transition">
             Home
           </Link>
           <span>&gt;</span>
-          <span className="font-semibold text-gray-900">Shop</span>
+          <span className="font-semibold text-gray-900">
+            {badge === 'FLASH_SALE' ? 'Offer Zone' : 'Shop'}
+          </span>
         </nav>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
@@ -272,15 +276,19 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
             {/* Product Grid: 4 per row on desktop */}
             {formattedProducts.length === 0 ? (
               <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center space-y-3">
-                <h3 className="text-sm font-bold text-gray-900">No Products Found</h3>
+                <h3 className="text-sm font-bold text-gray-900">
+                  {badge === 'FLASH_SALE' ? 'No offers right now' : 'No Products Found'}
+                </h3>
                 <p className="text-xs text-gray-500">
-                  No products match your selected filters. Try adjusting your filter selection.
+                  {badge === 'FLASH_SALE'
+                    ? 'Check back later for exciting offers and flash sales!'
+                    : 'No products match your selected filters. Try adjusting your filter selection.'}
                 </p>
                 <Link
                   href="/shop"
                   className="inline-block px-5 py-2 rounded-lg bg-[#cc272d] text-white text-xs font-bold hover:bg-red-700 transition"
                 >
-                  Clear Filters
+                  {badge === 'FLASH_SALE' ? 'View All Products' : 'Clear Filters'}
                 </Link>
               </div>
             ) : (

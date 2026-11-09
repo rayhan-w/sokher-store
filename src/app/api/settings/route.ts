@@ -54,6 +54,8 @@ export async function PUT(request: Request) {
       instagramUrl,
       youtubeUrl,
       tiktokUrl,
+      playStoreUrl,
+      appStoreUrl,
       deliveryDhaka,
       deliveryDhakaSuburbs,
       deliveryOutsideDhaka,
@@ -99,6 +101,8 @@ export async function PUT(request: Request) {
     if (instagramUrl !== undefined) updateData.instagramUrl = instagramUrl?.trim() || null;
     if (youtubeUrl !== undefined) updateData.youtubeUrl = youtubeUrl?.trim() || null;
     if (tiktokUrl !== undefined) updateData.tiktokUrl = tiktokUrl?.trim() || null;
+    if (playStoreUrl !== undefined) updateData.playStoreUrl = playStoreUrl?.trim() || null;
+    if (appStoreUrl !== undefined) updateData.appStoreUrl = appStoreUrl?.trim() || null;
 
     // Delivery Charges Single Source of Truth
     if (deliveryDhaka !== undefined) updateData.deliveryDhaka = parseFloat(deliveryDhaka) || 0;

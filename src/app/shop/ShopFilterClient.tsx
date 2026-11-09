@@ -94,6 +94,21 @@ export default function ShopFilterClient({
     setPriceLimit(val);
   };
 
+  // Live filter debounce when dragging price slider
+  useEffect(() => {
+    const currentParam = searchParams.get('maxPrice');
+    const paramVal = currentParam ? Number(currentParam) : maxPossiblePrice;
+    if (priceLimit === paramVal) return;
+
+    const timer = setTimeout(() => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set('maxPrice', priceLimit.toString());
+      updateFilters(params);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [priceLimit, maxPossiblePrice]);
+
   const handlePriceCommit = () => {
     const params = new URLSearchParams(searchParams.toString());
     params.set('maxPrice', priceLimit.toString());

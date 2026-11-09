@@ -133,18 +133,15 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
   }
 
   if (flags.length > 0) {
-    const flagConditions: any[] = [];
+    const allowedBadges: string[] = [];
     if (flags.includes('Best Selling')) {
-      flagConditions.push(
-        { badge: { in: ['Best Selling', 'Best Seller', 'HOT'] } },
-        { isFeatured: true }
-      );
+      allowedBadges.push('Best Selling', 'Best Seller');
     }
     if (flags.includes('New Arrival')) {
-      flagConditions.push({ badge: { in: ['New Arrival', 'New', 'NEW_ARRIVAL'] } });
+      allowedBadges.push('New Arrival', 'New', 'NEW_ARRIVAL');
     }
-    if (flagConditions.length > 0) {
-      conditions.push({ OR: flagConditions });
+    if (allowedBadges.length > 0) {
+      conditions.push({ badge: { in: allowedBadges } });
     }
   }
 

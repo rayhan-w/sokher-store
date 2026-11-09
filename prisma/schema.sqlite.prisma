@@ -229,6 +229,8 @@ model StoreSetting {
   instagramUrl           String?
   youtubeUrl             String?
   tiktokUrl              String?
+  playStoreUrl           String?
+  appStoreUrl            String?
   deliveryDhaka          Float    @default(70)
   deliveryDhakaSuburbs   Float    @default(100)
   deliveryOutsideDhaka   Float    @default(130)

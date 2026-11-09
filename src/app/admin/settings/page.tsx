@@ -30,9 +30,11 @@ export default function AdminSettingsPage() {
   const [contactAddress, setContactAddress] = useState('Dhaka, Bangladesh');
   const [whatsappNumber, setWhatsappNumber] = useState('+880 1700-000000');
 
-  // Social
+  // Social & App
   const [facebookUrl, setFacebookUrl] = useState('');
   const [instagramUrl, setInstagramUrl] = useState('');
+  const [playStoreUrl, setPlayStoreUrl] = useState('');
+  const [appStoreUrl, setAppStoreUrl] = useState('');
 
   // Payments (Masked display)
   const [bkashNumber, setBkashNumber] = useState('');
@@ -69,6 +71,8 @@ export default function AdminSettingsPage() {
 
         setFacebookUrl(s.facebookUrl || '');
         setInstagramUrl(s.instagramUrl || '');
+        setPlayStoreUrl(s.playStoreUrl || '');
+        setAppStoreUrl(s.appStoreUrl || '');
 
         setBkashNumber(s.bkashNumber || '');
         setNagadNumber(s.nagadNumber || '');
@@ -105,6 +109,8 @@ export default function AdminSettingsPage() {
         whatsappNumber: whatsappNumber.trim(),
         facebookUrl: facebookUrl.trim(),
         instagramUrl: instagramUrl.trim(),
+        playStoreUrl: playStoreUrl.trim() || null,
+        appStoreUrl: appStoreUrl.trim() || null,
         bkashNumber: bkashNumber.trim(),
         nagadNumber: nagadNumber.trim(),
         metaPixelId: metaPixelId.trim() || null,
@@ -403,6 +409,71 @@ export default function AdminSettingsPage() {
               value={gtmContainerId}
               onChange={(e) => setGtmContainerId(e.target.value)}
               className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#cc272d] font-mono uppercase"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* 5. Mobile App & Social Media */}
+      <div className="bg-white p-6 sm:p-8 rounded-3xl border border-gray-100 shadow-sm space-y-4">
+        <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider border-b border-gray-100 pb-3 flex items-center gap-2">
+          <span>Mobile App & Social Links</span>
+        </h2>
+
+        <p className="text-xs text-gray-500">
+          Enter store URLs for Android & iOS apps. If left blank, the app badges in the footer will automatically hide.
+        </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+          <div>
+            <label className="block font-semibold text-gray-700 mb-1">
+              Google Play Store URL
+            </label>
+            <input
+              type="url"
+              placeholder="https://play.google.com/store/apps/details?id=..."
+              value={playStoreUrl}
+              onChange={(e) => setPlayStoreUrl(e.target.value)}
+              className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#cc272d]"
+            />
+          </div>
+
+          <div>
+            <label className="block font-semibold text-gray-700 mb-1">
+              Apple App Store URL
+            </label>
+            <input
+              type="url"
+              placeholder="https://apps.apple.com/app/..."
+              value={appStoreUrl}
+              onChange={(e) => setAppStoreUrl(e.target.value)}
+              className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#cc272d]"
+            />
+          </div>
+
+          <div>
+            <label className="block font-semibold text-gray-700 mb-1">
+              Facebook Page URL
+            </label>
+            <input
+              type="url"
+              placeholder="https://facebook.com/..."
+              value={facebookUrl}
+              onChange={(e) => setFacebookUrl(e.target.value)}
+              className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#cc272d]"
+            />
+          </div>
+
+          <div>
+            <label className="block font-semibold text-gray-700 mb-1">
+              Instagram Profile URL
+            </label>
+            <input
+              type="url"
+              placeholder="https://instagram.com/..."
+              value={instagramUrl}
+              onChange={(e) => setInstagramUrl(e.target.value)}
+              className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#cc272d]"
             />
           </div>
         </div>
