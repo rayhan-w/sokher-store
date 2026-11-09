@@ -33,10 +33,11 @@ export default function AnnouncementBar({ settings }: AnnouncementBarProps) {
     `সারা দেশে দ্রুত ক্যাশ অন ডেলিভারি | ৳${defaultThreshold} বা তার বেশি অর্ডারে ফ্রি ডেলিভারি!`;
 
   return (
-    <div className="bg-[#b91c1c] text-white text-xs py-1.5 px-3 sm:px-6 border-b border-red-800/40 select-none">
-      <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 text-[11px] sm:text-xs">
-        {/* Left: Hotline & WhatsApp (Ghorer Bazar Style) */}
-        <div className="flex items-center gap-3 sm:gap-5 flex-shrink-0">
+    // Hidden on mobile to match Ghorer Bazar clean mobile layout exactly
+    <div className="hidden sm:block bg-[#b91c1c] text-white text-xs py-1.5 px-4 sm:px-6 border-b border-red-800/40 select-none">
+      <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 text-xs">
+        {/* Left: Hotline & WhatsApp */}
+        <div className="flex items-center gap-5 flex-shrink-0">
           <a
             href={`tel:${cleanPhone}`}
             className="flex items-center gap-1.5 font-medium hover:text-rose-200 transition"
@@ -60,20 +61,20 @@ export default function AnnouncementBar({ settings }: AnnouncementBarProps) {
           </a>
         </div>
 
-        {/* Center: Offer & Delivery Ticker */}
-        <div className="hidden lg:flex items-center justify-center gap-2 text-rose-100 flex-1 truncate px-4">
+        {/* Center: Delivery Ticker */}
+        <div className="flex items-center justify-center gap-2 text-rose-100 flex-1 truncate px-4">
           <Truck className="w-3.5 h-3.5 text-yellow-300 flex-shrink-0" />
           <span className="truncate font-medium">{announcement}</span>
         </div>
 
         {/* Right: Track Order & User Auth */}
-        <div className="flex items-center gap-3 sm:gap-4 font-medium flex-shrink-0">
+        <div className="flex items-center gap-4 font-medium flex-shrink-0">
           <Link
             href="/account"
             className="flex items-center gap-1 text-rose-100 hover:text-white transition"
           >
             <Package className="w-3.5 h-3.5 text-yellow-300" />
-            <span className="hidden sm:inline">অর্ডার ট্র্যাক</span>
+            <span>অর্ডার ট্র্যাক</span>
           </Link>
 
           <span className="text-red-400">|</span>
@@ -84,7 +85,7 @@ export default function AnnouncementBar({ settings }: AnnouncementBarProps) {
               className="flex items-center gap-1 hover:text-rose-200 transition"
             >
               <User className="w-3.5 h-3.5" />
-              <span className="max-w-[100px] truncate">{user.name}</span>
+              <span className="max-w-[120px] truncate">{user.name}</span>
             </Link>
           ) : (
             <Link

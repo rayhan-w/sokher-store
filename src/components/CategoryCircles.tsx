@@ -1,9 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ChevronRight, LayoutGrid } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface CategoryItem {
   id: string;
@@ -18,61 +18,76 @@ interface CategoryCirclesProps {
 }
 
 export default function CategoryCircles({ categories = [] }: CategoryCirclesProps) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
   if (!categories || categories.length === 0) return null;
 
+  const scrollLeft = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: -200, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: 200, behavior: 'smooth' });
+    }
+  };
+
   return (
-    <section className="max-w-7xl mx-auto px-3 sm:px-6 py-3 sm:py-6">
-      {/* Category Section Header (Compact) */}
-      <div className="flex items-center justify-between mb-2.5 sm:mb-4 border-b border-gray-100 pb-2">
-        <div className="flex items-center gap-1.5">
-          <div className="w-6 h-6 rounded-md bg-rose-50 text-[#cc272d] flex items-center justify-center">
-            <LayoutGrid className="w-3.5 h-3.5" />
-          </div>
-          <h2 className="text-sm sm:text-lg font-black text-gray-950 tracking-tight">
-            ক্যাটাগরি সমূহ (Categories)
-          </h2>
-        </div>
-        <Link
-          href="/shop"
-          className="inline-flex items-center text-[11px] sm:text-xs font-bold text-[#cc272d] hover:underline"
+    <section className="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-6 relative">
+      {/* Exact Match to Screenshot: Centered "Featured Categories" */}
+      <h2 className="text-base sm:text-xl font-bold text-gray-900 text-center mb-3 sm:mb-4">
+        Featured Categories
+      </h2>
+
+      {/* Categories Row with Side Navigation Arrow */}
+      <div className="relative group/cat">
+        {/* Left Arrow Button (Exact match to screenshot's left orange/red pill button) */}
+        <button
+          onClick={scrollLeft}
+          className="absolute -left-1 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-[#cc272d] text-white flex items-center justify-center shadow-md hover:bg-red-700 active:scale-95 transition"
+          aria-label="Scroll left"
         >
-          <span>সব দেখুন</span>
-          <ChevronRight className="w-3.5 h-3.5" />
-        </Link>
-      </div>
+          <ChevronLeft className="w-5 h-5" />
+        </button>
 
-      {/* Horizontal Scroll on Mobile + Grid on Desktop (Ghorer Bazar Style) */}
-      <div className="flex sm:grid sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 sm:gap-4 overflow-x-auto no-scrollbar pb-1">
-        {categories.map((cat) => (
-          <Link
-            key={cat.id}
-            href={`/category/${cat.slug}`}
-            className="flex-shrink-0 w-20 sm:w-auto group flex flex-col items-center text-center p-2 rounded-xl bg-white border border-gray-100 hover:border-[#cc272d] hover:shadow-md transition-all duration-200"
-          >
-            {/* Category Circular Thumbnail */}
-            <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-full p-0.5 bg-gradient-to-tr from-rose-200 to-white shadow-2xs group-hover:scale-105 transition-transform duration-300">
-              <div className="relative w-full h-full rounded-full overflow-hidden bg-rose-50 flex items-center justify-center">
-                {cat.image ? (
-                  <Image
-                    src={cat.image}
-                    alt={cat.name}
-                    fill
-                    className="object-cover group-hover:scale-110 transition-transform duration-300"
-                  />
-                ) : (
-                  <span className="text-base font-black text-[#cc272d]">
-                    {cat.name.charAt(0)}
-                  </span>
-                )}
+        {/* Scrollable Squircle Category Cards Container */}
+        <div
+          ref={scrollRef}
+          className="flex gap-4 sm:gap-6 overflow-x-auto no-scrollbar py-2 px-6 scroll-smooth"
+        >
+          {categories.map((cat) => (
+            <Link
+              key={cat.id}
+              href={`/category/${cat.slug}`}
+              className="flex-shrink-0 group flex flex-col items-center focus:outline-none"
+            >
+              {/* Squircle Card (Rounded-3xl white card with soft shadow) */}
+              <div className="w-24 sm:w-28 h-24 sm:h-28 rounded-3xl bg-white shadow-xs border border-gray-100/90 flex items-center justify-center p-3.5 group-hover:border-red-200 group-hover:shadow-md transition-all duration-300">
+                <div className="relative w-full h-full">
+                  {cat.image ? (
+                    <Image
+                      src={cat.image}
+                      alt={cat.name}
+                      fill
+                      className="object-contain p-1 group-hover:scale-108 transition-transform duration-300"
+                    />
+                  ) : (
+                    <div className="w-full h-full rounded-2xl bg-rose-50 flex items-center justify-center text-lg font-black text-[#cc272d]">
+                      {cat.name.charAt(0)}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
 
-            {/* Category Name */}
-            <span className="mt-1.5 text-[11px] sm:text-xs font-bold text-gray-800 group-hover:text-[#cc272d] transition line-clamp-1 w-full">
-              {cat.name}
-            </span>
-          </Link>
-        ))}
+              {/* Title Underneath Card */}
+              <span className="mt-2 text-xs sm:text-sm font-semibold text-gray-800 group-hover:text-[#cc272d] text-center max-w-[6.5rem] truncate">
+                {cat.name}
+              </span>
+            </Link>
+          ))}
+        </div>
       </div>
     </section>
   );

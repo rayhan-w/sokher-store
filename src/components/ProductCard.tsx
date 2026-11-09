@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { Star, ShoppingCart, Heart, Zap, CheckCircle2 } from 'lucide-react';
+import { Star, ShoppingCart, Heart, Zap, Flame } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { calculateDiscountPercent, formatPrice } from '@/lib/price-parser';
@@ -88,25 +88,13 @@ export default function ProductCard({ product }: ProductCardProps) {
   };
 
   return (
-    <div className="group relative bg-white rounded-xl border border-gray-200 hover:border-[#cc272d] hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden">
+    <div className="group relative bg-white rounded-2xl border border-gray-100 shadow-xs hover:border-[#cc272d] hover:shadow-lg transition-all duration-300 flex flex-col justify-between overflow-hidden">
       {/* Top Image Container */}
-      <div className="relative w-full aspect-square bg-[#FDFBFB] p-3 flex items-center justify-center overflow-hidden border-b border-gray-100">
-        {/* Discount Badge on Top-Left */}
-        {discountPercent > 0 ? (
-          <span className="absolute top-2.5 left-2.5 z-10 px-2 py-0.5 rounded-md text-[11px] font-black bg-[#cc272d] text-white shadow-sm flex items-center gap-1">
-            <span>{discountPercent}%</span>
-            <span>ছাড়</span>
-          </span>
-        ) : product.badge ? (
-          <span className="absolute top-2.5 left-2.5 z-10 px-2 py-0.5 rounded-md text-[11px] font-bold bg-[#cc272d] text-white shadow-sm">
-            {product.badge}
-          </span>
-        ) : null}
-
-        {/* Wishlist Button on Top-Right */}
+      <div className="relative w-full aspect-square bg-[#FDFBFB] p-3 flex items-center justify-center overflow-hidden">
+        {/* Wishlist Button on Top-Left */}
         <button
           onClick={handleToggleWishlist}
-          className={`absolute top-2.5 right-2.5 z-10 p-1.5 rounded-full backdrop-blur-md transition shadow-sm ${
+          className={`absolute top-2.5 left-2.5 z-10 p-1.5 rounded-full backdrop-blur-md transition shadow-2xs ${
             isFavorite
               ? 'bg-rose-50 text-[#cc272d] border border-red-200'
               : 'bg-white/80 hover:bg-white text-gray-400 hover:text-[#cc272d] border border-gray-100'
@@ -114,8 +102,14 @@ export default function ProductCard({ product }: ProductCardProps) {
           aria-label="উইশলিস্ট"
           title="পছন্দের তালিকায় রাখুন"
         >
-          <Heart className={`w-4 h-4 ${isFavorite ? 'fill-[#cc272d]' : ''}`} />
+          <Heart className={`w-3.5 h-3.5 ${isFavorite ? 'fill-[#cc272d]' : ''}`} />
         </button>
+
+        {/* Best Selling Badge on Top-Right (Exact match to screenshot) */}
+        <span className="absolute top-2.5 right-2.5 z-10 px-2 py-0.5 rounded-lg text-[10px] font-bold bg-[#cc272d] text-white shadow-2xs flex items-center gap-1">
+          <Flame className="w-3 h-3 fill-yellow-300 text-yellow-300" />
+          <span>{product.badge || 'Best Selling'}</span>
+        </span>
 
         {/* Product Image with Hover Zoom */}
         <Link
@@ -136,19 +130,19 @@ export default function ProductCard({ product }: ProductCardProps) {
       <div className="p-3 sm:p-4 flex-1 flex flex-col justify-between">
         <div>
           {/* Subtle Category */}
-          <div className="text-[11px] font-semibold text-gray-400 mb-1 truncate">
+          <div className="text-[10px] font-semibold text-gray-400 mb-0.5 truncate">
             {categoryName}
           </div>
 
-          {/* Product Title */}
+          {/* Product Title (Matches screenshot) */}
           <Link href={`/product/${product.slug}`}>
-            <h3 className="text-xs sm:text-sm font-bold text-gray-900 group-hover:text-[#cc272d] transition line-clamp-2 leading-snug min-h-[2.5rem]">
+            <h3 className="text-xs sm:text-sm font-bold text-gray-900 group-hover:text-[#cc272d] transition line-clamp-2 leading-snug min-h-[2.4rem]">
               {product.name}
             </h3>
           </Link>
 
           {/* Star Rating */}
-          <div className="flex items-center gap-1.5 mt-1.5">
+          <div className="flex items-center gap-1 mt-1">
             <div className="flex items-center gap-0.5">
               {[...Array(5)].map((_, i) => (
                 <Star
@@ -161,7 +155,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                 />
               ))}
             </div>
-            <span className="text-[11px] font-bold text-gray-700">
+            <span className="text-[10px] font-bold text-gray-700">
               {product.rating || 4.8}
             </span>
             <span className="text-[10px] text-gray-400">
@@ -170,26 +164,24 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
 
           {/* Price Line (Current Price, Regular Price, Discount Tag) */}
-          <div className="flex items-baseline gap-2 mt-2 flex-wrap">
+          <div className="flex items-baseline gap-2 mt-1.5 flex-wrap">
             <span className="text-sm sm:text-base font-black text-[#cc272d]">
               {formatPrice(product.price)}
             </span>
 
             {product.regularPrice && product.regularPrice > product.price && (
-              <span className="text-xs text-gray-400 line-through">
+              <span className="text-[11px] text-gray-400 line-through">
                 {formatPrice(product.regularPrice)}
               </span>
             )}
           </div>
         </div>
 
-        {/* ========================================================= */}
-        {/* DUAL ACTION BUTTONS (Ghorer Bazar Signature Conversion)    */}
-        {/* ========================================================= */}
+        {/* Dual Action Buttons */}
         <div className="mt-2.5 pt-2 border-t border-gray-100 flex items-center gap-1.5 sm:gap-2">
           {product.stock > 0 ? (
             <>
-              {/* Button 1: "অর্ডার করুন" (Instant Checkout) */}
+              {/* Button 1: "অর্ডার করুন" */}
               <button
                 type="button"
                 onClick={handleDirectOrder}
@@ -200,7 +192,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                 <span className="truncate">অর্ডার করুন</span>
               </button>
 
-              {/* Button 2: "কার্ট" (Add to Cart Drawer) */}
+              {/* Button 2: "কার্ট" */}
               <button
                 type="button"
                 onClick={handleAddToCart}

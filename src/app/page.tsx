@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { ChevronRight, Sparkles } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import prisma from '@/lib/prisma';
 import AnnouncementBar from '@/components/AnnouncementBar';
 import Header from '@/components/Header';
@@ -11,6 +11,7 @@ import ProductCard from '@/components/ProductCard';
 import PromoBanner from '@/components/PromoBanner';
 import FlashSaleSection from '@/components/FlashSaleSection';
 import Footer from '@/components/Footer';
+import FloatingCartTab from '@/components/FloatingCartTab';
 
 export const revalidate = 0; // Dynamic server-rendering for single source of truth
 
@@ -101,7 +102,7 @@ export default async function HomePage() {
       price: p.price,
       regularPrice: p.regularPrice,
       stock: p.stock,
-      badge: p.badge,
+      badge: p.badge || 'Best Selling',
       images: JSON.parse(p.images || '[]'),
       rating: avgRating,
       reviewCount: totalRatings > 0 ? totalRatings : 850,
@@ -110,59 +111,58 @@ export default async function HomePage() {
   });
 
   return (
-    <main className="min-h-screen bg-[#FFFDFD] pb-14 sm:pb-0">
-      {/* 1. Announcement Bar (Top Hotline & Free Delivery Notice) */}
+    <main className="min-h-screen bg-[#FFFDFD] pb-14 sm:pb-0 relative">
+      {/* 1. Announcement Bar (Hidden on Mobile to match screenshot) */}
       <AnnouncementBar settings={defaultSettings as any} />
 
-      {/* 2. Main 2-Tier Header (Mobile: Top row + Always visible full-width search) */}
+      {/* 2. Header (Exact mobile match: [☰]  [SOKHER STORE]  [🛒 0]) */}
       <Header settings={defaultSettings as any} categories={formattedCategories} />
 
-      {/* 3. Compact Banner Slider (On mobile it is compact h-36, doesn't eat screen space) */}
+      {/* 3. Hero Banner Slider (Exact mobile match: aspect-[16/9] with bottom-left dots) */}
       <HeroSlider slides={heroSlides} />
 
-      {/* 4. Category Section (Immediately follows the compact banner, Ghorer Bazar flow!) */}
+      {/* 4. Featured Categories (Exact match: centered title, squircle rounded-3xl cards with arrow) */}
       <CategoryCircles categories={formattedCategories} />
 
-      {/* 5. Flash Sale (if active) */}
+      {/* 5. Floating Side Cart Tab (Exact match: right edge pill with Items count & Price) */}
+      <FloatingCartTab />
+
+      {/* 6. Flash Sale (if active) */}
       {activeFlashSale && <FlashSaleSection flashSale={activeFlashSale} />}
 
-      {/* 6. Products Section (Popular & Featured Products, 2-col on mobile) */}
+      {/* 7. Top Selling Products (Exact match: centered title, 2-column cards with 🔥 Best Selling badge) */}
       <section className="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-8">
-        <div className="flex items-center justify-between mb-3 sm:mb-6 border-b border-gray-100 pb-2.5">
-          <div className="flex items-center gap-1.5">
-            <div className="w-6 h-6 rounded-md bg-rose-50 text-[#cc272d] flex items-center justify-center">
-              <Sparkles className="w-3.5 h-3.5" />
-            </div>
-            <h2 className="text-sm sm:text-xl font-black text-gray-950 tracking-tight">
-              জনপ্রিয় ও সেরা পণ্যসমূহ
-            </h2>
-          </div>
-          <Link
-            href="/shop"
-            className="inline-flex items-center text-[11px] sm:text-xs font-bold text-[#cc272d] hover:underline"
-          >
-            <span>সব পণ্য দেখুন</span>
-            <ChevronRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
+        <h2 className="text-base sm:text-xl font-bold text-gray-900 text-center mb-4 sm:mb-6">
+          Top Selling Products
+        </h2>
 
         {formattedFeaturedProducts.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-gray-200 p-8 text-center text-gray-500 text-xs">
+          <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center text-gray-500 text-xs">
             বর্তমানে কোনো পণ্য নেই।
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5 sm:gap-4 md:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-5">
             {formattedFeaturedProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
         )}
+
+        <div className="mt-8 text-center">
+          <Link
+            href="/shop"
+            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl border border-gray-200 hover:border-[#cc272d] text-xs font-bold text-gray-700 hover:text-[#cc272d] transition"
+          >
+            <span>View All Products</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
       </section>
 
-      {/* 7. Promotional Banner */}
+      {/* 8. Promotional Banner */}
       <PromoBanner banner={promoBanner} />
 
-      {/* 8. Trust & Assurance Bar (Placed near bottom so it never pushes categories/products away) */}
+      {/* 9. Trust & Assurance Bar (Placed near bottom) */}
       <div className="py-6 sm:py-10">
         <TrustBar
           items={
@@ -173,7 +173,7 @@ export default async function HomePage() {
         />
       </div>
 
-      {/* 9. Footer */}
+      {/* 10. Footer */}
       <Footer settings={defaultSettings as any} />
     </main>
   );

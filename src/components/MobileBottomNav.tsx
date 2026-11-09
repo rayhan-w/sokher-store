@@ -3,86 +3,94 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, LayoutGrid, PhoneCall, ShoppingBag, User } from 'lucide-react';
+import { Home, LayoutGrid, ShoppingBag, Search, User, MessageCircle } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
-import { formatPrice } from '@/lib/price-parser';
 
 export default function MobileBottomNav() {
   const pathname = usePathname();
-  const { totalItems, subtotal, setIsCartDrawerOpen } = useCart();
+  const { totalItems, setIsCartDrawerOpen } = useCart();
 
   // Hide on admin routes
   if (pathname.startsWith('/admin')) {
     return null;
   }
 
+  const handleOpenMenu = () => {
+    window.dispatchEvent(new CustomEvent('open-mobile-menu'));
+  };
+
+  const handleOpenSearch = () => {
+    window.dispatchEvent(new CustomEvent('open-mobile-search'));
+  };
+
   return (
-    <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-gray-200 py-1 px-2 shadow-2xl">
-      <div className="grid grid-cols-5 items-center text-center">
-        {/* 1. Home */}
-        <Link
-          href="/"
-          className={`flex flex-col items-center justify-center py-1.5 transition ${
-            pathname === '/' ? 'text-[#cc272d] font-bold' : 'text-gray-600 hover:text-gray-900'
-          }`}
-        >
-          <Home className="w-5 h-5" />
-          <span className="text-[10px] mt-0.5">হোম</span>
-        </Link>
+    <>
+      {/* Floating Chat Bubble at bottom-right (Exact match to screenshot's round orange button with chat icon) */}
+      <a
+        href="https://wa.me/8801700000000"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-20 right-4 z-40 w-12 h-12 rounded-full bg-[#cc272d] hover:bg-red-700 active:scale-95 text-white flex items-center justify-center shadow-2xl transition"
+        aria-label="Chat support"
+        title="WhatsApp Support"
+      >
+        <MessageCircle className="w-6 h-6 fill-white text-[#cc272d]" />
+      </a>
 
-        {/* 2. Categories */}
-        <Link
-          href="/shop"
-          className={`flex flex-col items-center justify-center py-1.5 transition ${
-            pathname === '/shop' ? 'text-[#cc272d] font-bold' : 'text-gray-600 hover:text-gray-900'
-          }`}
-        >
-          <LayoutGrid className="w-5 h-5" />
-          <span className="text-[10px] mt-0.5">ক্যাটাগরি</span>
-        </Link>
+      {/* Solid Brand-Colored Bottom Bar (Exact 1:1 match to user screenshot) */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#cc272d] text-white py-1.5 px-1 shadow-2xl select-none border-t border-red-700/50">
+        <div className="grid grid-cols-5 items-center text-center">
+          {/* 1. HOME */}
+          <Link
+            href="/"
+            className="flex flex-col items-center justify-center py-1 text-white hover:text-rose-100 active:scale-95 transition"
+          >
+            <Home className="w-5 h-5 stroke-[2.2]" />
+            <span className="text-[9px] font-bold tracking-wider mt-0.5 uppercase">HOME</span>
+          </Link>
 
-        {/* 3. Hotline Call (Instant Direct Dial) */}
-        <a
-          href="tel:+8801700000000"
-          className="flex flex-col items-center justify-center py-1.5 text-gray-600 hover:text-[#cc272d] transition"
-        >
-          <div className="w-7 h-7 rounded-full bg-rose-50 border border-red-200 text-[#cc272d] flex items-center justify-center shadow-sm">
-            <PhoneCall className="w-3.5 h-3.5" />
-          </div>
-          <span className="text-[10px] mt-0.5 font-bold text-[#cc272d]">কল করুন</span>
-        </a>
+          {/* 2. MENU */}
+          <button
+            onClick={handleOpenMenu}
+            className="flex flex-col items-center justify-center py-1 text-white hover:text-rose-100 active:scale-95 transition"
+          >
+            <LayoutGrid className="w-5 h-5 stroke-[2.2]" />
+            <span className="text-[9px] font-bold tracking-wider mt-0.5 uppercase">MENU</span>
+          </button>
 
-        {/* 4. Cart (With badge count & price) */}
-        <button
-          onClick={() => setIsCartDrawerOpen(true)}
-          className="flex flex-col items-center justify-center py-1.5 text-gray-600 hover:text-[#cc272d] transition relative"
-        >
-          <div className="relative">
-            <ShoppingBag className="w-5 h-5" />
-            {totalItems > 0 && (
-              <span className="absolute -top-1.5 -right-2 bg-[#cc272d] text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-black shadow-sm">
+          {/* 3. CART (With circular count badge) */}
+          <button
+            onClick={() => setIsCartDrawerOpen(true)}
+            className="flex flex-col items-center justify-center py-1 text-white hover:text-rose-100 active:scale-95 transition relative"
+          >
+            <div className="relative">
+              <ShoppingBag className="w-5 h-5 stroke-[2.2]" />
+              <span className="absolute -top-1.5 -right-2 bg-white text-[#cc272d] text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-xs">
                 {totalItems}
               </span>
-            )}
-          </div>
-          <span className="text-[10px] mt-0.5 font-bold">
-            {totalItems > 0 ? formatPrice(subtotal) : 'কার্ট'}
-          </span>
-        </button>
+            </div>
+            <span className="text-[9px] font-bold tracking-wider mt-0.5 uppercase">CART</span>
+          </button>
 
-        {/* 5. Account */}
-        <Link
-          href="/account"
-          className={`flex flex-col items-center justify-center py-1.5 transition ${
-            pathname.startsWith('/account') || pathname === '/login'
-              ? 'text-[#cc272d] font-bold'
-              : 'text-gray-600 hover:text-gray-900'
-          }`}
-        >
-          <User className="w-5 h-5" />
-          <span className="text-[10px] mt-0.5">অ্যাকাউন্ট</span>
-        </Link>
+          {/* 4. SEARCH */}
+          <button
+            onClick={handleOpenSearch}
+            className="flex flex-col items-center justify-center py-1 text-white hover:text-rose-100 active:scale-95 transition"
+          >
+            <Search className="w-5 h-5 stroke-[2.2]" />
+            <span className="text-[9px] font-bold tracking-wider mt-0.5 uppercase">SEARCH</span>
+          </button>
+
+          {/* 5. ACCOUNT */}
+          <Link
+            href="/account"
+            className="flex flex-col items-center justify-center py-1 text-white hover:text-rose-100 active:scale-95 transition"
+          >
+            <User className="w-5 h-5 stroke-[2.2]" />
+            <span className="text-[9px] font-bold tracking-wider mt-0.5 uppercase">ACCOUNT</span>
+          </Link>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
