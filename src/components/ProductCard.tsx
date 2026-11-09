@@ -186,33 +186,33 @@ export default function ProductCard({ product }: ProductCardProps) {
         {/* ========================================================= */}
         {/* DUAL ACTION BUTTONS (Ghorer Bazar Signature Conversion)    */}
         {/* ========================================================= */}
-        <div className="mt-3 pt-2.5 border-t border-gray-100 flex items-center gap-2">
+        <div className="mt-2.5 pt-2 border-t border-gray-100 flex items-center gap-1.5 sm:gap-2">
           {product.stock > 0 ? (
             <>
               {/* Button 1: "অর্ডার করুন" (Instant Checkout) */}
               <button
                 type="button"
                 onClick={handleDirectOrder}
-                className="flex-1 bg-[#cc272d] hover:bg-red-700 active:scale-95 text-white font-bold text-xs sm:text-sm py-2 px-2.5 rounded-lg flex items-center justify-center gap-1.5 shadow-sm transition"
+                className="flex-1 bg-[#cc272d] hover:bg-red-700 active:scale-95 text-white font-bold text-[11px] sm:text-xs md:text-sm py-1.5 sm:py-2 px-1.5 sm:px-2.5 rounded-lg flex items-center justify-center gap-1 shadow-xs transition"
                 title="সরাসরি অর্ডার করতে ক্লিক করুন"
               >
-                <Zap className="w-3.5 h-3.5 fill-white" />
-                <span>অর্ডার করুন</span>
+                <Zap className="w-3.5 h-3.5 fill-white flex-shrink-0" />
+                <span className="truncate">অর্ডার করুন</span>
               </button>
 
               {/* Button 2: "কার্ট" (Add to Cart Drawer) */}
               <button
                 type="button"
                 onClick={handleAddToCart}
-                className="p-2 rounded-lg border-2 border-[#cc272d] text-[#cc272d] hover:bg-rose-50 active:scale-95 transition flex items-center justify-center"
+                className="p-1.5 sm:p-2 rounded-lg border-2 border-[#cc272d] text-[#cc272d] hover:bg-rose-50 active:scale-95 transition flex items-center justify-center flex-shrink-0"
                 aria-label="কার্টে যোগ করুন"
                 title="কার্টে রাখুন"
               >
-                <ShoppingCart className="w-4 h-4" />
+                <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </button>
             </>
           ) : (
-            <div className="w-full py-2 px-3 rounded-lg bg-gray-100 text-gray-400 text-xs font-bold text-center">
+            <div className="w-full py-1.5 px-2 rounded-lg bg-gray-100 text-gray-400 text-[11px] sm:text-xs font-bold text-center">
               স্টক শেষ (Out of Stock)
             </div>
           )}

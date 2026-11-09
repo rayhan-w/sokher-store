@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ChevronRight, Sparkles } from 'lucide-react';
 import prisma from '@/lib/prisma';
 import AnnouncementBar from '@/components/AnnouncementBar';
 import Header from '@/components/Header';
@@ -110,58 +110,48 @@ export default async function HomePage() {
   });
 
   return (
-    <main className="min-h-screen bg-[#FFFDFD] pb-12 sm:pb-0">
-      {/* 1. Announcement Bar (Top Hotline & Notification) */}
+    <main className="min-h-screen bg-[#FFFDFD] pb-14 sm:pb-0">
+      {/* 1. Announcement Bar (Top Hotline & Free Delivery Notice) */}
       <AnnouncementBar settings={defaultSettings as any} />
 
-      {/* 2. Main 2-Tier Header (Ghorer Bazar Style) */}
+      {/* 2. Main 2-Tier Header (Mobile: Top row + Always visible full-width search) */}
       <Header settings={defaultSettings as any} categories={formattedCategories} />
 
-      {/* 3. Hero Slider */}
+      {/* 3. Compact Banner Slider (On mobile it is compact h-36, doesn't eat screen space) */}
       <HeroSlider slides={heroSlides} />
 
-      {/* 4. Trust Assurance Bar */}
-      <TrustBar
-        items={
-          (defaultSettings as any).trustBarItems
-            ? JSON.parse((defaultSettings as any).trustBarItems)
-            : null
-        }
-      />
-
-      {/* 5. Shop by Category (Ghorer Bazar Category Cards) */}
+      {/* 4. Category Section (Immediately follows the compact banner, Ghorer Bazar flow!) */}
       <CategoryCircles categories={formattedCategories} />
 
-      {/* 6. Flash Sale (if active) */}
+      {/* 5. Flash Sale (if active) */}
       {activeFlashSale && <FlashSaleSection flashSale={activeFlashSale} />}
 
-      {/* 7. Featured Products (Ghorer Bazar Grid & 1-Click Order Cards) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="flex items-end justify-between mb-8 border-b border-gray-200 pb-4">
-          <div>
-            <div className="flex items-center gap-1.5 text-xs font-bold text-[#cc272d] uppercase tracking-wider mb-1">
-              <Sparkles className="w-4 h-4" />
-              <span>সেরা পণ্য সংগ্রহ</span>
+      {/* 6. Products Section (Popular & Featured Products, 2-col on mobile) */}
+      <section className="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-8">
+        <div className="flex items-center justify-between mb-3 sm:mb-6 border-b border-gray-100 pb-2.5">
+          <div className="flex items-center gap-1.5">
+            <div className="w-6 h-6 rounded-md bg-rose-50 text-[#cc272d] flex items-center justify-center">
+              <Sparkles className="w-3.5 h-3.5" />
             </div>
-            <h2 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">
-              জনপ্রিয় ও ফিচার্ড পণ্যসমূহ
+            <h2 className="text-sm sm:text-xl font-black text-gray-950 tracking-tight">
+              জনপ্রিয় ও সেরা পণ্যসমূহ
             </h2>
           </div>
           <Link
             href="/shop"
-            className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#cc272d] hover:text-red-700 hover:underline"
+            className="inline-flex items-center text-[11px] sm:text-xs font-bold text-[#cc272d] hover:underline"
           >
-            <span>সকল পণ্য দেখুন</span>
-            <ArrowRight className="w-4 h-4" />
+            <span>সব পণ্য দেখুন</span>
+            <ChevronRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
         {formattedFeaturedProducts.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center text-gray-500">
+          <div className="bg-white rounded-2xl border border-gray-200 p-8 text-center text-gray-500 text-xs">
             বর্তমানে কোনো পণ্য নেই।
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5 sm:gap-4 md:gap-6">
             {formattedFeaturedProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
@@ -169,10 +159,21 @@ export default async function HomePage() {
         )}
       </section>
 
-      {/* 8. Promotional Banner ("Glow Naturally") */}
+      {/* 7. Promotional Banner */}
       <PromoBanner banner={promoBanner} />
 
-      {/* 9. Footer (Ghorer Bazar Multi-Column Footer) */}
+      {/* 8. Trust & Assurance Bar (Placed near bottom so it never pushes categories/products away) */}
+      <div className="py-6 sm:py-10">
+        <TrustBar
+          items={
+            (defaultSettings as any).trustBarItems
+              ? JSON.parse((defaultSettings as any).trustBarItems)
+              : null
+          }
+        />
+      </div>
+
+      {/* 9. Footer */}
       <Footer settings={defaultSettings as any} />
     </main>
   );

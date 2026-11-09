@@ -62,7 +62,7 @@ export default function TrustBar({ items }: TrustBarProps) {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-8 relative z-20">
+    <div className="max-w-7xl mx-auto px-3 sm:px-6">
       <div className="bg-white rounded-2xl shadow-xl shadow-rose-950/5 border border-gray-200 p-4 sm:p-6">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 divide-y sm:divide-y-0 divide-gray-100">
           {displayItems.map((item, idx) => (
