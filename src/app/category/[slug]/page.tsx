@@ -7,6 +7,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import ShopFilterClient from '@/app/shop/ShopFilterClient';
+import SortSelect, { SortOption } from '@/components/SortSelect';
 
 export const revalidate = 0;
 
@@ -23,6 +24,15 @@ interface CategoryPageProps {
     page?: string;
   };
 }
+
+const CATEGORY_SORT_OPTIONS: SortOption[] = [
+  { value: 'default', label: 'Default' },
+  { value: 'latest', label: 'Latest' },
+  { value: 'oldest', label: 'Oldest' },
+  { value: 'price-low-to-high', label: 'Price Low to High' },
+  { value: 'price-high-to-low', label: 'Price High to Low' },
+  { value: 'offered-products', label: 'Offered Products' },
+];
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
   const category = await prisma.category.findUnique({
@@ -102,55 +112,67 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
   });
   const availableBrands = Array.from(brandSet).sort();
 
-  // Build Where clause for products in this category
-  const where: any = {
-    status: 'ACTIVE',
-    categories: {
-      some: {
-        categoryId: currentCategory.id,
+  // Build clean conditions array for Prisma query
+  const conditions: any[] = [
+    { status: 'ACTIVE' },
+    {
+      categories: {
+        some: {
+          categoryId: currentCategory.id,
+        },
       },
     },
-  };
+  ];
 
   if (subs.length > 0) {
-    where.subcategory = {
-      slug: { in: subs },
-    };
+    conditions.push({
+      subcategory: {
+        slug: { in: subs },
+      },
+    });
   }
 
   if (flags.length > 0) {
-    const orConditions: any[] = [];
+    const flagConditions: any[] = [];
     if (flags.includes('Best Selling')) {
-      orConditions.push(
+      flagConditions.push(
         { badge: { in: ['Best Selling', 'Best Seller', 'HOT'] } },
         { isFeatured: true }
       );
     }
     if (flags.includes('New Arrival')) {
-      orConditions.push({ badge: { in: ['New Arrival', 'New', 'NEW_ARRIVAL'] } });
+      flagConditions.push({ badge: { in: ['New Arrival', 'New', 'NEW_ARRIVAL'] } });
     }
-    if (orConditions.length > 0) {
-      where.OR = orConditions;
+    if (flagConditions.length > 0) {
+      conditions.push({ OR: flagConditions });
     }
   }
 
   if (maxPrice) {
-    where.price = { lte: parseFloat(maxPrice) };
+    conditions.push({ price: { lte: parseFloat(maxPrice) } });
   }
 
   if (brands.length > 0) {
-    where.AND = brands.map((b) => ({
-      specification: { contains: b },
-    }));
+    conditions.push({
+      AND: brands.map((b) => ({
+        specification: { contains: b },
+      })),
+    });
   }
+
+  if (sort === 'offered-products') {
+    conditions.push({ regularPrice: { not: null } });
+  }
+
+  const where: any = conditions.length === 1 ? conditions[0] : { AND: conditions };
 
   // Category Page Sort: Default, Latest, Oldest, Price Low to High, Price High to Low, Offered Products
   let orderBy: any = { createdAt: 'desc' };
   if (sort === 'latest') orderBy = { createdAt: 'desc' };
-  if (sort === 'oldest') orderBy = { createdAt: 'asc' };
-  if (sort === 'price-low-to-high') orderBy = { price: 'asc' };
-  if (sort === 'price-high-to-low') orderBy = { price: 'desc' };
-  if (sort === 'offered-products') orderBy = { regularPrice: 'desc' };
+  else if (sort === 'oldest') orderBy = { createdAt: 'asc' };
+  else if (sort === 'price-low-to-high') orderBy = { price: 'asc' };
+  else if (sort === 'price-high-to-low') orderBy = { price: 'desc' };
+  else if (sort === 'offered-products') orderBy = { regularPrice: 'desc' };
 
   const [totalCount, products] = await Promise.all([
     prisma.product.count({ where }),
@@ -196,7 +218,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 
   const createPageUrl = (pageNum: number) => {
     const params = new URLSearchParams();
-    if (sort) params.set('sort', sort);
+    if (sort && sort !== 'default') params.set('sort', sort);
     if (maxPrice) params.set('maxPrice', maxPrice);
     flags.forEach((f) => params.append('flag', f));
     subs.forEach((s) => params.append('sub', s));
@@ -210,7 +232,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
       <Header settings={defaultSettings as any} categories={formattedCategories} />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1 w-full">
-        {/* Exact Breadcrumb (Home > Shop > Category) — REMOVED oversized heading and Reset button */}
+        {/* Exact Breadcrumb (Home > Shop > Category) — clean, no oversized heading, no Reset button */}
         <nav className="text-xs text-gray-500 mb-6 flex items-center gap-2">
           <Link href="/" className="hover:text-[#cc272d] transition">
             Home
@@ -224,7 +246,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
         </nav>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
-          {/* Category Page Sidebar: FILTER BY CATEGORY -> PRODUCT FLAG -> PRICE RANGE -> BRANDS */}
+          {/* Category Page Sidebar: FILTER BY CATEGORY (sub-category checkboxes) -> PRICE RANGE -> BRANDS */}
           <aside className="lg:col-span-1">
             <ShopFilterClient
               isCategoryPage={true}
@@ -246,35 +268,11 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
               {/* Exact Category Page Sort Options */}
               <div className="flex items-center gap-2 text-xs">
                 <span className="text-gray-500 font-medium">Sort by:</span>
-                <form method="GET" action={`/category/${slug}`} className="inline">
-                  {flags.map((f, i) => (
-                    <input key={i} type="hidden" name="flag" value={f} />
-                  ))}
-                  {subs.map((s, i) => (
-                    <input key={i} type="hidden" name="sub" value={s} />
-                  ))}
-                  {brands.map((b, i) => (
-                    <input key={i} type="hidden" name="brand" value={b} />
-                  ))}
-                  {maxPrice && <input type="hidden" name="maxPrice" value={maxPrice} />}
-                  <select
-                    name="sort"
-                    defaultValue={sort}
-                    onChange={(e) => e.target.form?.submit()}
-                    className="bg-white border border-gray-200 rounded-lg py-1.5 px-3 text-xs font-semibold text-gray-800 focus:outline-none focus:border-[#cc272d] cursor-pointer"
-                  >
-                    <option value="default">Default</option>
-                    <option value="latest">Latest</option>
-                    <option value="oldest">Oldest</option>
-                    <option value="price-low-to-high">Price Low to High</option>
-                    <option value="price-high-to-low">Price High to Low</option>
-                    <option value="offered-products">Offered Products</option>
-                  </select>
-                </form>
+                <SortSelect currentSort={sort} options={CATEGORY_SORT_OPTIONS} />
               </div>
             </div>
 
-            {/* Product Grid: 4 per row on desktop (currently 3) */}
+            {/* Product Grid: 4 per row on desktop */}
             {formattedProducts.length === 0 ? (
               <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center space-y-3">
                 <h3 className="text-sm font-bold text-gray-900">No Products in this Category</h3>
@@ -289,14 +287,14 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                 </Link>
               </div>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
                 {formattedProducts.map((p) => (
                   <ProductCard key={p.id} product={p} />
                 ))}
               </div>
             )}
 
-            {/* Numbered Pagination: 1 2 3 ... 16 per page */}
+            {/* Numbered Pagination: 16 per page */}
             {totalPages > 1 && (
               <div className="flex items-center justify-center gap-1.5 mt-10">
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (

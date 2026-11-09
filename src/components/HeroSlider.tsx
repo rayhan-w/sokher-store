@@ -32,6 +32,7 @@ interface HeroSliderProps {
 
 export default function HeroSlider({ slides = [], promoBanner }: HeroSliderProps) {
   const [currentIdx, setCurrentIdx] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
 
   const displaySlides: Slide[] =
     slides.length > 0
@@ -58,12 +59,12 @@ export default function HeroSlider({ slides = [], promoBanner }: HeroSliderProps
   };
 
   useEffect(() => {
-    if (displaySlides.length <= 1) return;
+    if (displaySlides.length <= 1 || isPaused) return;
     const interval = setInterval(() => {
       setCurrentIdx((prev) => (prev + 1) % displaySlides.length);
     }, 5000);
     return () => clearInterval(interval);
-  }, [displaySlides.length]);
+  }, [displaySlides.length, isPaused]);
 
   const slide = displaySlides[currentIdx] || displaySlides[0];
 
@@ -79,17 +80,21 @@ export default function HeroSlider({ slides = [], promoBanner }: HeroSliderProps
 
   return (
     <section className="max-w-7xl mx-auto px-3 sm:px-6 pt-3 pb-2">
-      {/* 2-Column Banner Grid matching Ghorer Bazar Desktop View */}
+      {/* 2-Column Banner Grid matching Ghorer Bazar Desktop View (2/3 Left Slider + 1/3 Right Static Banner) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
-        {/* Left Column: Main Banner Carousel */}
-        <div className="lg:col-span-8 relative w-full aspect-[16/9] lg:aspect-[2.15/1] rounded-2xl overflow-hidden shadow-xs border border-gray-100 bg-gray-50 group">
+        {/* Left Column: Main Banner Auto-Playing Carousel with Pause on Hover */}
+        <div
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+          className="lg:col-span-8 relative w-full aspect-[16/9] lg:aspect-[2.15/1] rounded-2xl overflow-hidden shadow-xs border border-gray-100 bg-gray-50 group"
+        >
           <Link href={slide.buttonUrl || '/shop'} className="block w-full h-full relative">
             <Image
               src={slide.imageUrl}
               alt={slide.title || 'Sokher Store Promotion'}
               fill
               priority
-              className="object-cover object-center"
+              className="object-cover object-center transition-all duration-700 ease-out"
             />
 
             {/* Headline and Offer Badge Overlay (Full Bengali Unicode Text Rendering) */}
@@ -119,6 +124,7 @@ export default function HeroSlider({ slides = [], promoBanner }: HeroSliderProps
           {/* Left Arrow Button */}
           {displaySlides.length > 1 && (
             <button
+              type="button"
               onClick={prevSlide}
               className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white/90 hover:bg-white text-gray-700 shadow-md flex items-center justify-center transition active:scale-95 opacity-80 group-hover:opacity-100"
               aria-label="Previous slide"
@@ -130,6 +136,7 @@ export default function HeroSlider({ slides = [], promoBanner }: HeroSliderProps
           {/* Right Arrow Button */}
           {displaySlides.length > 1 && (
             <button
+              type="button"
               onClick={nextSlide}
               className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white/90 hover:bg-white text-gray-700 shadow-md flex items-center justify-center transition active:scale-95 opacity-80 group-hover:opacity-100"
               aria-label="Next slide"
@@ -144,6 +151,7 @@ export default function HeroSlider({ slides = [], promoBanner }: HeroSliderProps
               {displaySlides.map((_, i) => (
                 <button
                   key={i}
+                  type="button"
                   onClick={() => setCurrentIdx(i)}
                   className={`h-2 rounded-full transition-all duration-300 ${
                     i === currentIdx
@@ -157,7 +165,7 @@ export default function HeroSlider({ slides = [], promoBanner }: HeroSliderProps
           )}
         </div>
 
-        {/* Right Column (Desktop Only): Side Promotional Banner Card */}
+        {/* Right Column (Desktop Only): Side Promotional Banner Card (Static) */}
         <div className="hidden lg:block lg:col-span-4 relative rounded-2xl overflow-hidden shadow-xs border border-gray-100 bg-gray-50 group">
           <Link href={defaultPromo.buttonUrl || '/shop'} className="block w-full h-full relative min-h-[220px]">
             <Image

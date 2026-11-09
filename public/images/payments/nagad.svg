@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 70 28" width="70" height="28">
+  <rect width="70" height="28" rx="4" fill="#FFFFFF"/>
+  <circle cx="14" cy="14" r="8" fill="#F7941D"/>
+  <path d="M12 9c2 0 4 2 4 5s-2 5-4 5c-1 0-2-.5-2-1.5 0-1.5 1.5-2 1.5-3.5S10 12 12 9z" fill="#FFFFFF"/>
+  <text x="26" y="19" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="900" fill="#F7941D">Nagad</text>
+</svg>

@@ -43,12 +43,26 @@ interface HeaderProps {
   }>;
 }
 
+const DEFAULT_NAV_CATEGORIES = [
+  { id: 'cat-skincare', name: 'Skincare', slug: 'skincare', subcategories: [] },
+  { id: 'cat-makeup', name: 'Makeup', slug: 'makeup', subcategories: [] },
+  { id: 'cat-hair-care', name: 'Hair Care', slug: 'hair-care', subcategories: [] },
+  { id: 'cat-fragrance', name: 'Fragrance', slug: 'fragrance', subcategories: [] },
+  { id: 'cat-body-care', name: 'Body Care', slug: 'body-care', subcategories: [] },
+  { id: 'cat-personal-care', name: 'Personal Care', slug: 'personal-care', subcategories: [] },
+  { id: 'cat-men-care', name: 'Men Care', slug: 'men-care', subcategories: [] },
+  { id: 'cat-accessories', name: 'Accessories', slug: 'accessories', subcategories: [] },
+];
+
 export default function Header({ settings, categories = [] }: HeaderProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { totalItems, subtotal, setIsCartDrawerOpen } = useCart();
   const { totalWishlist } = useWishlist();
   const { user } = useAuth();
+
+  // Instant Nav Rendering: Render full nav immediately with fallback to eliminate initial paint delay
+  const navCategories = categories && categories.length > 0 ? categories : DEFAULT_NAV_CATEGORIES;
 
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState<any[]>([]);
@@ -491,7 +505,7 @@ export default function Header({ settings, categories = [] }: HeaderProps) {
             </Link>
 
             {/* Category Items with Dropdown on Hover */}
-            {categories.map((cat) => {
+            {navCategories.map((cat) => {
               const hasSubs = cat.subcategories && cat.subcategories.length > 0;
               return (
                 <div key={cat.id} className="relative group/nav py-1">
@@ -619,7 +633,7 @@ export default function Header({ settings, categories = [] }: HeaderProps) {
                   </Link>
                 </h4>
                 <div className="space-y-1">
-                  {categories.map((cat) => {
+                  {navCategories.map((cat) => {
                     const isExpanded = expandedMobileCat === cat.id;
                     const hasSubs = cat.subcategories && cat.subcategories.length > 0;
 

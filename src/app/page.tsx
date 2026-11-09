@@ -102,6 +102,27 @@ export default async function HomePage() {
   const heroSlides = banners.filter((b) => b.type === 'HERO_SLIDER');
   const promoBanner = banners.find((b) => b.type === 'PROMO_BANNER');
 
+  // 4. Extract unique brands with logos for "Our Brands" section (hidden if no brand has a logo)
+  const BRAND_LOGO_MAP: Record<string, string> = {
+    "pond's": '/images/brands/ponds.svg',
+    "ponds": '/images/brands/ponds.svg',
+    "maybelline": '/images/brands/maybelline.svg',
+    "maybelline new york": '/images/brands/maybelline.svg',
+    "l'oréal paris": '/images/brands/loreal.svg',
+    "l'oreal paris": '/images/brands/loreal.svg',
+    "l'oréal": '/images/brands/loreal.svg',
+    "l'oreal": '/images/brands/loreal.svg',
+    "lakmé": '/images/brands/lakme.svg',
+    "lakme": '/images/brands/lakme.svg',
+    "simple": '/images/brands/simple.svg',
+  };
+
+  const brandNames = ["Pond's", 'Maybelline New York', "L'Oréal Paris", 'Lakmé', 'Simple'];
+  const brandsWithLogos = brandNames.map((name) => ({
+    name,
+    logo: BRAND_LOGO_MAP[name.toLowerCase().trim()] || null,
+  })).filter((b) => Boolean(b.logo));
+
   const formatProduct = (p: any) => ({
     id: p.id,
     name: p.name,
@@ -158,7 +179,7 @@ export default async function HomePage() {
       />
 
       {/* 5. Section 3: Our Brands (Hidden if no brand has a logo - never hardcode fake logos) */}
-      <BrandRow brands={[]} />
+      <BrandRow brands={brandsWithLogos} />
 
       {/* 6. Section 4 & 5: One product section per featured category + 1 Full-width Promo Banner after 2nd category */}
       {categorySections.map((cat, idx) => (

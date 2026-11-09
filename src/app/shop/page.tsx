@@ -5,6 +5,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import ShopFilterClient from './ShopFilterClient';
+import SortSelect, { SortOption } from '@/components/SortSelect';
 
 export const revalidate = 0;
 
@@ -14,13 +15,35 @@ interface ShopPageProps {
     sort?: string;
     flag?: string | string[];
     brand?: string | string[];
+    category?: string;
+    subcategory?: string;
+    badge?: string;
     maxPrice?: string;
     page?: string;
   };
 }
 
+const SHOP_SORT_OPTIONS: SortOption[] = [
+  { value: 'default', label: 'Default' },
+  { value: 'best-selling', label: 'Best Selling' },
+  { value: 'latest', label: 'Latest' },
+  { value: 'price-low-to-high', label: 'Price Low to High' },
+  { value: 'price-high-to-low', label: 'Price High to Low' },
+];
+
 export default async function ShopPage({ searchParams }: ShopPageProps) {
-  const { search, sort = 'default', flag, brand, maxPrice, page = '1' } = searchParams;
+  const {
+    search,
+    sort = 'default',
+    flag,
+    brand,
+    category,
+    subcategory,
+    badge,
+    maxPrice,
+    page = '1',
+  } = searchParams;
+
   const currentPage = Math.max(1, parseInt(page, 10) || 1);
   const pageSize = 16;
 
@@ -28,7 +51,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   const flags = Array.isArray(flag) ? flag : flag ? [flag] : [];
   const brands = Array.isArray(brand) ? brand : brand ? [brand] : [];
 
-  // Fetch Settings & Categories for header
+  // Fetch Settings, Categories, & catalog stats
   const [settings, categories, allActiveProducts] = await Promise.all([
     prisma.storeSetting.findUnique({ where: { id: 'default' } }),
     prisma.category.findMany({
@@ -66,50 +89,89 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   });
   const availableBrands = Array.from(brandSet).sort();
 
-  // Build Where clause for products
-  const where: any = { status: 'ACTIVE' };
+  // Build conditions array for clean Prisma querying
+  const conditions: any[] = [{ status: 'ACTIVE' }];
 
   if (search) {
     const q = search.trim();
-    where.OR = [
-      { name: { contains: q } },
-      { description: { contains: q } },
-      { sku: { contains: q } },
-    ];
+    conditions.push({
+      OR: [
+        { name: { contains: q } },
+        { description: { contains: q } },
+        { sku: { contains: q } },
+      ],
+    });
+  }
+
+  if (category) {
+    conditions.push({
+      categories: {
+        some: {
+          category: { slug: category },
+        },
+      },
+    });
+  }
+
+  if (subcategory) {
+    conditions.push({
+      subcategory: { slug: subcategory },
+    });
+  }
+
+  if (badge) {
+    if (badge === 'FLASH_SALE' || badge === 'OFFER' || badge === 'DISCOUNT') {
+      conditions.push({
+        regularPrice: { not: null },
+      });
+    } else {
+      conditions.push({
+        badge: { contains: badge },
+      });
+    }
   }
 
   if (flags.length > 0) {
-    const orConditions: any[] = [];
+    const flagConditions: any[] = [];
     if (flags.includes('Best Selling')) {
-      orConditions.push(
+      flagConditions.push(
         { badge: { in: ['Best Selling', 'Best Seller', 'HOT'] } },
         { isFeatured: true }
       );
     }
     if (flags.includes('New Arrival')) {
-      orConditions.push({ badge: { in: ['New Arrival', 'New', 'NEW_ARRIVAL'] } });
+      flagConditions.push({ badge: { in: ['New Arrival', 'New', 'NEW_ARRIVAL'] } });
     }
-    if (orConditions.length > 0) {
-      where.OR = where.OR ? [...where.OR, ...orConditions] : orConditions;
+    if (flagConditions.length > 0) {
+      conditions.push({ OR: flagConditions });
     }
   }
 
   if (maxPrice) {
-    where.price = { lte: parseFloat(maxPrice) };
+    conditions.push({ price: { lte: parseFloat(maxPrice) } });
   }
 
   if (brands.length > 0) {
-    where.AND = brands.map((b) => ({
-      specification: { contains: b },
-    }));
+    conditions.push({
+      AND: brands.map((b) => ({
+        specification: { contains: b },
+      })),
+    });
   }
 
-  // Sort: Default, Best Selling, Latest, Price Low to High, Price High to Low
+  const where: any = conditions.length === 1 ? conditions[0] : { AND: conditions };
+
+  // Sort logic: Default, Best Selling (also handles 'popular'), Latest, Price Low to High, Price High to Low
   let orderBy: any = { createdAt: 'desc' };
-  if (sort === 'best-selling') orderBy = { viewCount: 'desc' };
-  if (sort === 'latest') orderBy = { createdAt: 'desc' };
-  if (sort === 'price-low-to-high') orderBy = { price: 'asc' };
-  if (sort === 'price-high-to-low') orderBy = { price: 'desc' };
+  if (sort === 'best-selling' || sort === 'popular') {
+    orderBy = { viewCount: 'desc' };
+  } else if (sort === 'latest') {
+    orderBy = { createdAt: 'desc' };
+  } else if (sort === 'price-low-to-high') {
+    orderBy = { price: 'asc' };
+  } else if (sort === 'price-high-to-low') {
+    orderBy = { price: 'desc' };
+  }
 
   const [totalCount, products] = await Promise.all([
     prisma.product.count({ where }),
@@ -156,7 +218,10 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   const createPageUrl = (pageNum: number) => {
     const params = new URLSearchParams();
     if (search) params.set('search', search);
-    if (sort) params.set('sort', sort);
+    if (sort && sort !== 'default') params.set('sort', sort);
+    if (category) params.set('category', category);
+    if (subcategory) params.set('subcategory', subcategory);
+    if (badge) params.set('badge', badge);
     if (maxPrice) params.set('maxPrice', maxPrice);
     flags.forEach((f) => params.append('flag', f));
     brands.forEach((b) => params.append('brand', b));
@@ -200,32 +265,11 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
               {/* Exact Shop Sort Options */}
               <div className="flex items-center gap-2 text-xs">
                 <span className="text-gray-500 font-medium">Sort by:</span>
-                <form method="GET" action="/shop" className="inline">
-                  {flags.map((f, i) => (
-                    <input key={i} type="hidden" name="flag" value={f} />
-                  ))}
-                  {brands.map((b, i) => (
-                    <input key={i} type="hidden" name="brand" value={b} />
-                  ))}
-                  {maxPrice && <input type="hidden" name="maxPrice" value={maxPrice} />}
-                  <select
-                    name="sort"
-                    defaultValue={sort}
-                    // Trigger form submit on change
-                    onChange={(e) => e.target.form?.submit()}
-                    className="bg-white border border-gray-200 rounded-lg py-1.5 px-3 text-xs font-semibold text-gray-800 focus:outline-none focus:border-[#cc272d] cursor-pointer"
-                  >
-                    <option value="default">Default</option>
-                    <option value="best-selling">Best Selling</option>
-                    <option value="latest">Latest</option>
-                    <option value="price-low-to-high">Price Low to High</option>
-                    <option value="price-high-to-low">Price High to Low</option>
-                  </select>
-                </form>
+                <SortSelect currentSort={sort} options={SHOP_SORT_OPTIONS} />
               </div>
             </div>
 
-            {/* Product Grid: 4 per row on desktop (currently 3) */}
+            {/* Product Grid: 4 per row on desktop */}
             {formattedProducts.length === 0 ? (
               <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center space-y-3">
                 <h3 className="text-sm font-bold text-gray-900">No Products Found</h3>
@@ -240,14 +284,14 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
                 </Link>
               </div>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
                 {formattedProducts.map((p) => (
                   <ProductCard key={p.id} product={p} />
                 ))}
               </div>
             )}
 
-            {/* Numbered Pagination: 1 2 3 ... 16 per page */}
+            {/* Numbered Pagination: 16 per page */}
             {totalPages > 1 && (
               <div className="flex items-center justify-center gap-1.5 mt-10">
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (

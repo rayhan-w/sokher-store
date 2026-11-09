@@ -82,6 +82,22 @@ export default function ProductDetailClient({
     }
   }
 
+  const BRAND_LOGOS: Record<string, string> = {
+    "pond's": '/images/brands/ponds.svg',
+    "ponds": '/images/brands/ponds.svg',
+    "maybelline": '/images/brands/maybelline.svg',
+    "maybelline new york": '/images/brands/maybelline.svg',
+    "l'oréal paris": '/images/brands/loreal.svg',
+    "l'oreal paris": '/images/brands/loreal.svg',
+    "l'oréal": '/images/brands/loreal.svg',
+    "l'oreal": '/images/brands/loreal.svg',
+    "lakmé": '/images/brands/lakme.svg',
+    "lakme": '/images/brands/lakme.svg',
+    "simple": '/images/brands/simple.svg',
+  };
+  const brandKey = brandName ? brandName.toLowerCase().trim() : '';
+  const brandLogo = brandKey ? BRAND_LOGOS[brandKey] : null;
+
   // Calculate review metrics
   const totalReviews = reviewsList.length;
   const avgRating =
@@ -423,11 +439,21 @@ export default function ProductDetailClient({
             </div>
           </div>
 
-          {/* Bordered "Brand: <brand name>" Chip (Hidden if product has no brand) */}
+          {/* Bordered "Brand: <brand name>" Chip with Logo (Hidden if product has no brand) */}
           {brandName && (
             <div className="pt-2">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-gray-200 bg-gray-50 text-xs font-bold text-gray-800">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-gray-200 bg-gray-50 text-xs font-bold text-gray-800 shadow-2xs">
                 <span className="text-gray-500 font-semibold">Brand:</span>
+                {brandLogo && (
+                  <div className="relative w-14 h-4 flex items-center">
+                    <Image
+                      src={brandLogo}
+                      alt={brandName}
+                      fill
+                      className="object-contain"
+                    />
+                  </div>
+                )}
                 <span className="text-[#cc272d]">{brandName}</span>
               </div>
             </div>

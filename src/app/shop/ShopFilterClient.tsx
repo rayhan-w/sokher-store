@@ -102,27 +102,59 @@ export default function ShopFilterClient({
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-6 shadow-xs select-none">
-      {/* 1. Category Page ONLY: "FILTER BY CATEGORY" (Sub-category checkboxes) */}
-      {isCategoryPage && subcategories.length > 0 && (
+      {/* Category Page: 1. FILTER BY CATEGORY (Sub-category checkboxes) */}
+      {isCategoryPage && (
         <div className="space-y-3">
           <h3 className="text-xs sm:text-sm font-black text-gray-900 uppercase tracking-wider">
             FILTER BY CATEGORY
           </h3>
+          {subcategories.length === 0 ? (
+            <p className="text-xs text-gray-400 italic">No subcategories</p>
+          ) : (
+            <div className="space-y-2">
+              {subcategories.map((sub) => {
+                const checked = selectedSubs.includes(sub.slug);
+                return (
+                  <label
+                    key={sub.id}
+                    className="flex items-center gap-2.5 text-xs text-gray-700 hover:text-[#cc272d] cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() => handleSubcategoryToggle(sub.slug)}
+                      className="w-4 h-4 rounded text-[#cc272d] focus:ring-[#cc272d] border-gray-300"
+                    />
+                    <span>{sub.name}</span>
+                  </label>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Shop Page ONLY: 1. PRODUCT FLAG Checkboxes (Best Selling, New Arrival) */}
+      {!isCategoryPage && (
+        <div className="space-y-3">
+          <h3 className="text-xs sm:text-sm font-black text-gray-900 uppercase tracking-wider">
+            PRODUCT FLAG
+          </h3>
           <div className="space-y-2">
-            {subcategories.map((sub) => {
-              const checked = selectedSubs.includes(sub.slug);
+            {['Best Selling', 'New Arrival'].map((flag) => {
+              const checked = selectedFlags.includes(flag);
               return (
                 <label
-                  key={sub.id}
+                  key={flag}
                   className="flex items-center gap-2.5 text-xs text-gray-700 hover:text-[#cc272d] cursor-pointer"
                 >
                   <input
                     type="checkbox"
                     checked={checked}
-                    onChange={() => handleSubcategoryToggle(sub.slug)}
+                    onChange={() => handleFlagToggle(flag)}
                     className="w-4 h-4 rounded text-[#cc272d] focus:ring-[#cc272d] border-gray-300"
                   />
-                  <span>{sub.name}</span>
+                  <span>{flag}</span>
                 </label>
               );
             })}
@@ -130,33 +162,7 @@ export default function ShopFilterClient({
         </div>
       )}
 
-      {/* 2. PRODUCT FLAG Checkboxes (Best Selling, New Arrival) */}
-      <div className={`space-y-3 ${isCategoryPage ? 'border-t border-gray-100 pt-5' : ''}`}>
-        <h3 className="text-xs sm:text-sm font-black text-gray-900 uppercase tracking-wider">
-          PRODUCT FLAG
-        </h3>
-        <div className="space-y-2">
-          {['Best Selling', 'New Arrival'].map((flag) => {
-            const checked = selectedFlags.includes(flag);
-            return (
-              <label
-                key={flag}
-                className="flex items-center gap-2.5 text-xs text-gray-700 hover:text-[#cc272d] cursor-pointer"
-              >
-                <input
-                  type="checkbox"
-                  checked={checked}
-                  onChange={() => handleFlagToggle(flag)}
-                  className="w-4 h-4 rounded text-[#cc272d] focus:ring-[#cc272d] border-gray-300"
-                />
-                <span>{flag}</span>
-              </label>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* 3. PRICE RANGE Live Slider with ৳ min/max labels */}
+      {/* Both Shop & Category: PRICE RANGE Live Slider with ৳ labels */}
       <div className="border-t border-gray-100 pt-5 space-y-3">
         <h3 className="text-xs sm:text-sm font-black text-gray-900 uppercase tracking-wider">
           PRICE RANGE
@@ -180,7 +186,7 @@ export default function ShopFilterClient({
         </div>
       </div>
 
-      {/* 4. BRANDS Checkboxes */}
+      {/* Both Shop & Category: BRANDS Checkboxes */}
       {availableBrands.length > 0 && (
         <div className="border-t border-gray-100 pt-5 space-y-3">
           <h3 className="text-xs sm:text-sm font-black text-gray-900 uppercase tracking-wider">

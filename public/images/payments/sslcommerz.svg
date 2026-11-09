@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 28" width="90" height="28">
+  <rect width="90" height="28" rx="4" fill="#FFFFFF"/>
+  <path d="M10 6l5 3v5c0 4-5 7-5 7s-5-3-5-7V9l5-3z" fill="#0D47A1"/>
+  <path d="M10 9l3 1.8v3.2c0 2.4-3 4.2-3 4.2s-3-1.8-3-4.2v-3.2L10 9z" fill="#00C853"/>
+  <text x="22" y="18" font-family="'Segoe UI', Roboto, sans-serif" font-size="9" font-weight="900" fill="#263238">SSLCOMMERZ</text>
+</svg>

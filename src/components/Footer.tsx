@@ -132,13 +132,14 @@ export default function Footer({ settings, categories = [] }: FooterProps) {
                       href={settings.playStoreUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-block"
+                      className="inline-block hover:opacity-90 transition"
                     >
                       <Image
-                        src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
+                        src="/images/badges/google-play.svg"
                         alt="Get it on Google Play"
-                        width={110}
-                        height={33}
+                        width={120}
+                        height={36}
+                        className="h-9 w-auto"
                       />
                     </a>
                   )}
@@ -147,13 +148,14 @@ export default function Footer({ settings, categories = [] }: FooterProps) {
                       href={settings.appStoreUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-block"
+                      className="inline-block hover:opacity-90 transition"
                     >
                       <Image
-                        src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg"
+                        src="/images/badges/app-store.svg"
                         alt="Download on the App Store"
-                        width={110}
-                        height={33}
+                        width={120}
+                        height={36}
+                        className="h-9 w-auto"
                       />
                     </a>
                   )}
@@ -321,33 +323,30 @@ export default function Footer({ settings, categories = [] }: FooterProps) {
           <p>© {currentYear} Sokher Store. All Rights Reserved.</p>
 
           {/* Real Payment Provider Logos */}
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2.5 flex-wrap">
             {/* bKash */}
-            <div className="h-6 px-2 bg-white rounded flex items-center justify-center shadow-xs">
-              <span className="text-[11px] font-black text-[#D12053]">bKash</span>
+            <div className="h-7 px-1.5 bg-white rounded-md border border-gray-100 flex items-center justify-center shadow-2xs">
+              <Image src="/images/payments/bkash.svg" alt="bKash" width={56} height={22} className="h-5 w-auto object-contain" />
             </div>
             {/* Nagad */}
-            <div className="h-6 px-2 bg-white rounded flex items-center justify-center shadow-xs">
-              <span className="text-[11px] font-black text-[#F7941D]">Nagad</span>
+            <div className="h-7 px-1.5 bg-white rounded-md border border-gray-100 flex items-center justify-center shadow-2xs">
+              <Image src="/images/payments/nagad.svg" alt="Nagad" width={56} height={22} className="h-5 w-auto object-contain" />
             </div>
             {/* Rocket */}
-            <div className="h-6 px-2 bg-white rounded flex items-center justify-center shadow-xs">
-              <span className="text-[11px] font-black text-[#8C3494]">Rocket</span>
+            <div className="h-7 px-1.5 bg-white rounded-md border border-gray-100 flex items-center justify-center shadow-2xs">
+              <Image src="/images/payments/rocket.svg" alt="Rocket" width={56} height={22} className="h-5 w-auto object-contain" />
             </div>
             {/* Visa */}
-            <div className="h-6 px-2 bg-white rounded flex items-center justify-center shadow-xs">
-              <span className="text-[11px] font-black text-[#1A1F71] italic">VISA</span>
+            <div className="h-7 px-1.5 bg-white rounded-md border border-gray-100 flex items-center justify-center shadow-2xs">
+              <Image src="/images/payments/visa.svg" alt="Visa" width={56} height={22} className="h-5 w-auto object-contain" />
             </div>
             {/* Mastercard */}
-            <div className="h-6 px-2 bg-white rounded flex items-center justify-center shadow-xs">
-              <div className="flex items-center -space-x-1">
-                <span className="w-3 h-3 rounded-full bg-[#EB001B] inline-block" />
-                <span className="w-3 h-3 rounded-full bg-[#F79E1B] inline-block opacity-90" />
-              </div>
+            <div className="h-7 px-1.5 bg-white rounded-md border border-gray-100 flex items-center justify-center shadow-2xs">
+              <Image src="/images/payments/mastercard.svg" alt="Mastercard" width={56} height={22} className="h-5 w-auto object-contain" />
             </div>
             {/* SSLCommerz */}
-            <div className="h-6 px-2 bg-white rounded flex items-center justify-center shadow-xs">
-              <span className="text-[10px] font-black text-gray-800">SSLCOMMERZ</span>
+            <div className="h-7 px-1.5 bg-white rounded-md border border-gray-100 flex items-center justify-center shadow-2xs">
+              <Image src="/images/payments/sslcommerz.svg" alt="SSLCommerz" width={72} height={22} className="h-5 w-auto object-contain" />
             </div>
           </div>
         </div>

@@ -19,7 +19,7 @@ export default function FloatingCartTab() {
         <ShoppingBag className="w-5 h-5 text-white group-hover:scale-105 transition-transform" />
       </div>
       <span className="text-[10px] font-bold mt-1 text-white whitespace-nowrap">
-        {totalItems} Items
+        {totalItems === 1 ? '1 Item' : `${totalItems} Items`}
       </span>
       <span className="text-[11px] font-black mt-0.5 text-white whitespace-nowrap">
         {formatPrice(subtotal)}

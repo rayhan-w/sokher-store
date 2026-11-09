@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 70 28" width="70" height="28">
+  <rect width="70" height="28" rx="4" fill="#FFFFFF"/>
+  <path d="M14 6l6 8-7 4 3-7-6-2 4-3z" fill="#D12053"/>
+  <path d="M20 14l-4 6 7-2-3-4z" fill="#D12053"/>
+  <text x="28" y="19" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="900" fill="#D12053">bKash</text>
+</svg>

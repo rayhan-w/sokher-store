@@ -216,8 +216,7 @@ async function main() {
       categorySlugs: ["skincare"],
       subcategorySlug: "skincare-day-cream",
       images: JSON.stringify([
-        "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=800&auto=format&fit=crop&q=80",
-        "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800&auto=format&fit=crop&q=80",
+        "/images/products/ponds-bright-beauty.png",
       ]),
       description: "Pond's Bright Beauty Day Cream with Vitamin B3+ and Gluta-Boost technology helps eliminate dark spots and brightens your skin tone from within with SPF 15 PA++ protection.",
       specification: JSON.stringify({
@@ -244,8 +243,7 @@ async function main() {
       categorySlugs: ["makeup"],
       subcategorySlug: "makeup-foundation",
       images: JSON.stringify([
-        "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&auto=format&fit=crop&q=80",
-        "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=800&auto=format&fit=crop&q=80",
+        "/images/products/maybelline-fit-me.png",
       ]),
       description: "Maybelline Fit Me Matte + Poreless liquid foundation is formulated with micro-powders that control shine and blur pores for a natural, seamless finish that lasts all day.",
       specification: JSON.stringify({
@@ -276,8 +274,7 @@ async function main() {
       categorySlugs: ["hair-care"],
       subcategorySlug: "hair-care-shampoo",
       images: JSON.stringify([
-        "https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388?w=800&auto=format&fit=crop&q=80",
-        "https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?w=800&auto=format&fit=crop&q=80",
+        "/images/products/loreal-elseve.png",
       ]),
       description: "L'Oréal Paris Elseve Total Repair 5 shampoo tackles 5 hair problems: hair fall, dryness, roughness, dullness, and split ends with concentrated ceramide cement.",
       specification: JSON.stringify({
@@ -303,8 +300,7 @@ async function main() {
       categorySlugs: ["makeup"],
       subcategorySlug: "makeup-lipstick",
       images: JSON.stringify([
-        "https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=800&auto=format&fit=crop&q=80",
-        "https://images.unsplash.com/photo-1503236823255-94609f598e71?w=800&auto=format&fit=crop&q=80",
+        "/images/products/lakme-matte-lipstick.jpg",
       ]),
       description: "Lakmé 9 to 5 Primer + Matte Lip Color gives you an intense matte payoff that glides smoothly and stays all day without drying your lips.",
       specification: JSON.stringify({
@@ -334,8 +330,7 @@ async function main() {
       categorySlugs: ["skincare"],
       subcategorySlug: "skincare-face-wash",
       images: JSON.stringify([
-        "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800&auto=format&fit=crop&q=80",
-        "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=800&auto=format&fit=crop&q=80",
+        "/images/products/simple-refreshing-facewash.png",
       ]),
       description: "Simple Kind to Skin Refreshing Facial Wash 100% soap-free gel cleanser removes dirt, oil, and impurities without stripping natural skin moisture.",
       specification: JSON.stringify({

@@ -252,19 +252,23 @@ export default function CheckoutFormClient({ settings }: CheckoutFormProps) {
               {[
                 {
                   id: 'DHAKA',
-                  label: 'Inside Dhaka City',
+                  label: 'Inside Dhaka',
                   charge: settings.deliveryDhaka,
                   desc: 'Delivery within 24-48 hours',
                 },
-                {
-                  id: 'DHAKA_SUBURB',
-                  label: 'Dhaka Suburbs (Savar, Keraniganj, Tongi, Gazipur)',
-                  charge: settings.deliveryDhakaSuburbs,
-                  desc: 'Delivery within 2-3 days',
-                },
+                ...((settings as any).enableSuburbsDelivery
+                  ? [
+                      {
+                        id: 'DHAKA_SUBURB',
+                        label: 'Dhaka Suburbs (Savar, Keraniganj, Tongi, Gazipur)',
+                        charge: settings.deliveryDhakaSuburbs,
+                        desc: 'Delivery within 2-3 days',
+                      },
+                    ]
+                  : []),
                 {
                   id: 'OUTSIDE_DHAKA',
-                  label: 'Outside Dhaka (All over Bangladesh)',
+                  label: 'Outside Dhaka',
                   charge: settings.deliveryOutsideDhaka,
                   desc: 'Home delivery within 3-4 days',
                 },
