@@ -18,6 +18,10 @@ import {
   Truck,
   User,
   MapPin,
+  HelpCircle,
+  Info,
+  Phone,
+  MessageCircle,
 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
@@ -54,12 +58,16 @@ export default function Header({ settings, categories = [] }: HeaderProps) {
   const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
   const [expandedMobileCat, setExpandedMobileCat] = useState<string | null>(null);
 
+  const [moreDropdownOpen, setMoreDropdownOpen] = useState(false);
+
   const searchRefDesktop = useRef<HTMLDivElement>(null);
   const searchInputMobileRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const moreDropdownRef = useRef<HTMLDivElement>(null);
 
   const hotline = settings.contactPhone || '+880 1700-000000';
   const cleanPhone = hotline.replace(/[^0-9+]/g, '');
+  const cleanWa = cleanPhone.replace(/[^0-9]/g, '');
 
   // Listen for events from MobileBottomNav
   useEffect(() => {
@@ -111,6 +119,9 @@ export default function Header({ settings, categories = [] }: HeaderProps) {
       }
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setCategoryDropdownOpen(false);
+      }
+      if (moreDropdownRef.current && !moreDropdownRef.current.contains(event.target as Node)) {
+        setMoreDropdownOpen(false);
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
@@ -398,17 +409,72 @@ export default function Header({ settings, categories = [] }: HeaderProps) {
                 </span>
               </button>
 
-              {/* 5. More */}
-              <button
-                type="button"
-                onClick={() => setMobileMenuOpen(true)}
-                className="flex flex-col items-center justify-center text-gray-700 hover:text-[#cc272d] transition group min-w-[48px]"
-              >
-                <Menu className="w-5 h-5 stroke-[1.6] group-hover:scale-105 transition-transform" />
-                <span className="text-[11px] font-medium text-gray-600 group-hover:text-[#cc272d] mt-1 whitespace-nowrap">
-                  More
-                </span>
-              </button>
+              {/* 5. More (Desktop Dropdown: Wishlists, Faqs, About Us, Call Us, WhatsApp) */}
+              <div ref={moreDropdownRef} className="relative">
+                <button
+                  type="button"
+                  onClick={() => setMoreDropdownOpen((prev) => !prev)}
+                  className="flex flex-col items-center justify-center text-gray-700 hover:text-[#cc272d] transition group min-w-[48px]"
+                  aria-expanded={moreDropdownOpen}
+                  aria-label="More options"
+                >
+                  <Menu className="w-5 h-5 stroke-[1.6] group-hover:scale-105 transition-transform" />
+                  <span className="text-[11px] font-medium text-gray-600 group-hover:text-[#cc272d] mt-1 whitespace-nowrap">
+                    More
+                  </span>
+                </button>
+
+                {moreDropdownOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-xl shadow-2xl border border-gray-100 py-2 z-50 animate-in fade-in-50 duration-150">
+                    <Link
+                      href="/account/wishlist"
+                      onClick={() => setMoreDropdownOpen(false)}
+                      className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-gray-700 hover:bg-rose-50 hover:text-[#cc272d] transition"
+                    >
+                      <Heart className="w-4 h-4 text-gray-400" />
+                      <span>Wishlists</span>
+                    </Link>
+
+                    <Link
+                      href="/faq"
+                      onClick={() => setMoreDropdownOpen(false)}
+                      className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-gray-700 hover:bg-rose-50 hover:text-[#cc272d] transition"
+                    >
+                      <HelpCircle className="w-4 h-4 text-gray-400" />
+                      <span>Faqs</span>
+                    </Link>
+
+                    <Link
+                      href="/about"
+                      onClick={() => setMoreDropdownOpen(false)}
+                      className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-gray-700 hover:bg-rose-50 hover:text-[#cc272d] transition"
+                    >
+                      <Info className="w-4 h-4 text-gray-400" />
+                      <span>About Us</span>
+                    </Link>
+
+                    <a
+                      href={`tel:${cleanPhone}`}
+                      onClick={() => setMoreDropdownOpen(false)}
+                      className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-gray-700 hover:bg-rose-50 hover:text-[#cc272d] transition"
+                    >
+                      <Phone className="w-4 h-4 text-gray-400" />
+                      <span>Call Us ({hotline})</span>
+                    </a>
+
+                    <a
+                      href={`https://wa.me/${cleanWa}?text=Hello%20Sokher%20Store%2C%20I%20have%20an%20inquiry`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setMoreDropdownOpen(false)}
+                      className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-emerald-600 hover:bg-emerald-50 transition"
+                    >
+                      <MessageCircle className="w-4 h-4 text-emerald-600" />
+                      <span>WhatsApp</span>
+                    </a>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -416,10 +482,10 @@ export default function Header({ settings, categories = [] }: HeaderProps) {
         {/* Tier 2: Solid Dark Sub-Navigation Bar */}
         <div className="bg-[#18181b] text-white border-t border-gray-800">
           <div className="max-w-7xl mx-auto px-6 flex items-center gap-7 overflow-x-auto no-scrollbar py-2 text-xs font-medium">
-            {/* Offer Zone */}
+            {/* Offer Zone: All nav items white text */}
             <Link
               href="/shop?badge=FLASH_SALE"
-              className="text-rose-300 hover:text-white font-bold whitespace-nowrap py-1 transition flex items-center gap-1"
+              className="text-white hover:text-gray-200 font-bold whitespace-nowrap py-1 transition flex items-center gap-1"
             >
               <span>Offer Zone</span>
             </Link>
@@ -431,7 +497,7 @@ export default function Header({ settings, categories = [] }: HeaderProps) {
                 <div key={cat.id} className="relative group/nav py-1">
                   <Link
                     href={`/category/${cat.slug}`}
-                    className="text-gray-200 hover:text-white whitespace-nowrap flex items-center gap-1 transition"
+                    className="text-white hover:text-gray-200 whitespace-nowrap flex items-center gap-1 transition"
                   >
                     <span>{cat.name}</span>
                     {hasSubs && (

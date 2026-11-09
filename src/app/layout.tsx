@@ -5,7 +5,8 @@ import { CartProvider } from '@/context/CartContext';
 import { WishlistProvider } from '@/context/WishlistContext';
 import CartDrawer from '@/components/CartDrawer';
 import MobileBottomNav from '@/components/MobileBottomNav';
-import AiShoppingAssistant from '@/components/AiShoppingAssistant';
+import FloatingCartTab from '@/components/FloatingCartTab';
+import ScrollToTop from '@/components/ScrollToTop';
 import TrackingScripts from '@/components/TrackingScripts';
 import prisma from '@/lib/prisma';
 
@@ -59,7 +60,8 @@ export default async function RootLayout({
               {/* Global Interactive Overlays */}
               <CartDrawer />
               <MobileBottomNav />
-              <AiShoppingAssistant />
+              <FloatingCartTab />
+              <ScrollToTop />
             </WishlistProvider>
           </CartProvider>
         </AuthProvider>

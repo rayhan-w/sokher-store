@@ -1,195 +1,212 @@
 'use client';
 
-import React, { useState } from 'react';
-import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { Filter, Check, ChevronDown } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 
-interface CategoryItem {
+interface SubcategoryItem {
   id: string;
   name: string;
   slug: string;
-  productCount: number;
-  subcategories: Array<{ id: string; name: string; slug: string }>;
 }
 
 interface ShopFilterClientProps {
-  categories: CategoryItem[];
-  currentCategory?: string;
-  currentSubcategory?: string;
+  isCategoryPage?: boolean;
+  subcategories?: SubcategoryItem[];
+  maxPossiblePrice?: number;
+  availableBrands?: string[];
+  basePath?: string;
 }
 
 export default function ShopFilterClient({
-  categories,
-  currentCategory,
-  currentSubcategory,
+  isCategoryPage = false,
+  subcategories = [],
+  maxPossiblePrice = 5000,
+  availableBrands = [],
+  basePath = '/shop',
 }: ShopFilterClientProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const [minPrice, setMinPrice] = useState(searchParams.get('minPrice') || '');
-  const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') || '');
-  const [isOpenMobile, setIsOpenMobile] = useState(false);
+  // Selected filters from searchParams
+  const selectedFlags = searchParams.getAll('flag');
+  const selectedSubs = searchParams.getAll('sub');
+  const selectedBrands = searchParams.getAll('brand');
+  const initialMaxPrice = searchParams.get('maxPrice')
+    ? Number(searchParams.get('maxPrice'))
+    : maxPossiblePrice;
 
-  const handlePriceApply = (e: React.FormEvent) => {
-    e.preventDefault();
+  const [priceLimit, setPriceLimit] = useState(initialMaxPrice);
+
+  useEffect(() => {
+    if (searchParams.get('maxPrice')) {
+      setPriceLimit(Number(searchParams.get('maxPrice')));
+    } else {
+      setPriceLimit(maxPossiblePrice);
+    }
+  }, [searchParams, maxPossiblePrice]);
+
+  const updateFilters = (newParams: URLSearchParams) => {
+    newParams.set('page', '1'); // Reset to page 1 on filter change
+    router.push(`${pathname}?${newParams.toString()}`);
+  };
+
+  const handleFlagToggle = (flagValue: string) => {
     const params = new URLSearchParams(searchParams.toString());
-    if (minPrice) params.set('minPrice', minPrice);
-    else params.delete('minPrice');
+    const current = params.getAll('flag');
+    params.delete('flag');
 
-    if (maxPrice) params.set('maxPrice', maxPrice);
-    else params.delete('maxPrice');
-
-    router.push(`/shop?${params.toString()}`);
+    if (current.includes(flagValue)) {
+      current.filter((f) => f !== flagValue).forEach((f) => params.append('flag', f));
+    } else {
+      [...current, flagValue].forEach((f) => params.append('flag', f));
+    }
+    updateFilters(params);
   };
 
-  const handleClearFilters = () => {
-    setMinPrice('');
-    setMaxPrice('');
-    router.push('/shop');
+  const handleSubcategoryToggle = (subSlug: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    const current = params.getAll('sub');
+    params.delete('sub');
+
+    if (current.includes(subSlug)) {
+      current.filter((s) => s !== subSlug).forEach((s) => params.append('sub', s));
+    } else {
+      [...current, subSlug].forEach((s) => params.append('sub', s));
+    }
+    updateFilters(params);
   };
 
-  const activeCategory = categories.find((c) => c.slug === currentCategory);
+  const handleBrandToggle = (brandName: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    const current = params.getAll('brand');
+    params.delete('brand');
 
-  const filterContent = (
-    <div className="space-y-6">
-      {/* Category List */}
-      <div>
-        <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-3">Categories</h3>
-        <ul className="space-y-1.5 text-xs">
-          <li>
-            <Link
-              href="/shop"
-              className={`flex items-center justify-between py-1 px-2 rounded-lg transition ${
-                !currentCategory ? 'bg-rose-50 text-[#cc272d] font-bold' : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              <span>All Categories</span>
-            </Link>
-          </li>
-          {categories.map((cat) => (
-            <li key={cat.id}>
-              <Link
-                href={`/shop?category=${cat.slug}`}
-                className={`flex items-center justify-between py-1 px-2 rounded-lg transition ${
-                  currentCategory === cat.slug
-                    ? 'bg-rose-50 text-[#cc272d] font-bold'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                <span>{cat.name}</span>
-                <span className="text-[11px] text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded-full font-semibold">
-                  {cat.productCount}
-                </span>
-              </Link>
+    if (current.includes(brandName)) {
+      current.filter((b) => b !== brandName).forEach((b) => params.append('brand', b));
+    } else {
+      [...current, brandName].forEach((b) => params.append('brand', b));
+    }
+    updateFilters(params);
+  };
 
-              {/* Subcategories if category is selected */}
-              {currentCategory === cat.slug && cat.subcategories && cat.subcategories.length > 0 && (
-                <ul className="pl-4 mt-1 space-y-1 border-l-2 border-rose-100">
-                  {cat.subcategories.map((sub) => (
-                    <li key={sub.id}>
-                      <Link
-                        href={`/shop?category=${cat.slug}&subcategory=${sub.slug}`}
-                        className={`block py-0.5 text-[11px] transition ${
-                          currentSubcategory === sub.slug
-                            ? 'text-[#cc272d] font-bold'
-                            : 'text-gray-500 hover:text-gray-900'
-                        }`}
-                      >
-                        • {sub.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </li>
-          ))}
-        </ul>
-      </div>
+  const handlePriceChange = (val: number) => {
+    setPriceLimit(val);
+  };
 
-      {/* Price Range Filter */}
-      <div className="border-t border-gray-100 pt-6">
-        <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-3">Price Range (৳)</h3>
-        <form onSubmit={handlePriceApply} className="space-y-3">
-          <div className="flex items-center gap-2">
-            <input
-              type="number"
-              placeholder="Min"
-              value={minPrice}
-              onChange={(e) => setMinPrice(e.target.value)}
-              className="w-full p-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#cc272d]"
-            />
-            <span className="text-gray-400">-</span>
-            <input
-              type="number"
-              placeholder="Max"
-              value={maxPrice}
-              onChange={(e) => setMaxPrice(e.target.value)}
-              className="w-full p-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#cc272d]"
-            />
+  const handlePriceCommit = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('maxPrice', priceLimit.toString());
+    updateFilters(params);
+  };
+
+  return (
+    <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-6 shadow-xs select-none">
+      {/* 1. Category Page ONLY: "FILTER BY CATEGORY" (Sub-category checkboxes) */}
+      {isCategoryPage && subcategories.length > 0 && (
+        <div className="space-y-3">
+          <h3 className="text-xs sm:text-sm font-black text-gray-900 uppercase tracking-wider">
+            FILTER BY CATEGORY
+          </h3>
+          <div className="space-y-2">
+            {subcategories.map((sub) => {
+              const checked = selectedSubs.includes(sub.slug);
+              return (
+                <label
+                  key={sub.id}
+                  className="flex items-center gap-2.5 text-xs text-gray-700 hover:text-[#cc272d] cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={() => handleSubcategoryToggle(sub.slug)}
+                    className="w-4 h-4 rounded text-[#cc272d] focus:ring-[#cc272d] border-gray-300"
+                  />
+                  <span>{sub.name}</span>
+                </label>
+              );
+            })}
           </div>
-          <button
-            type="submit"
-            className="w-full py-1.5 bg-[#cc272d] hover:bg-red-700 text-white text-xs font-semibold rounded-lg transition"
-          >
-            Apply Price Filter
-          </button>
-        </form>
-      </div>
+        </div>
+      )}
 
-      {/* Badges / Special Filters */}
-      <div className="border-t border-gray-100 pt-6">
-        <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-3">Popular Badges</h3>
-        <div className="flex flex-wrap gap-1.5">
-          {['Best Seller', 'New', 'Hot'].map((b) => (
-            <Link
-              key={b}
-              href={`/shop?badge=${encodeURIComponent(b)}`}
-              className="px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700 hover:bg-rose-50 hover:text-[#cc272d] transition"
-            >
-              {b}
-            </Link>
-          ))}
+      {/* 2. PRODUCT FLAG Checkboxes (Best Selling, New Arrival) */}
+      <div className={`space-y-3 ${isCategoryPage ? 'border-t border-gray-100 pt-5' : ''}`}>
+        <h3 className="text-xs sm:text-sm font-black text-gray-900 uppercase tracking-wider">
+          PRODUCT FLAG
+        </h3>
+        <div className="space-y-2">
+          {['Best Selling', 'New Arrival'].map((flag) => {
+            const checked = selectedFlags.includes(flag);
+            return (
+              <label
+                key={flag}
+                className="flex items-center gap-2.5 text-xs text-gray-700 hover:text-[#cc272d] cursor-pointer"
+              >
+                <input
+                  type="checkbox"
+                  checked={checked}
+                  onChange={() => handleFlagToggle(flag)}
+                  className="w-4 h-4 rounded text-[#cc272d] focus:ring-[#cc272d] border-gray-300"
+                />
+                <span>{flag}</span>
+              </label>
+            );
+          })}
         </div>
       </div>
 
-      {/* Reset Filter Button */}
-      {(currentCategory || currentSubcategory || minPrice || maxPrice) && (
-        <div className="pt-2">
-          <button
-            onClick={handleClearFilters}
-            className="w-full py-2 border border-gray-200 hover:bg-gray-50 text-gray-700 text-xs font-semibold rounded-lg transition"
-          >
-            Reset All Filters
-          </button>
+      {/* 3. PRICE RANGE Live Slider with ৳ min/max labels */}
+      <div className="border-t border-gray-100 pt-5 space-y-3">
+        <h3 className="text-xs sm:text-sm font-black text-gray-900 uppercase tracking-wider">
+          PRICE RANGE
+        </h3>
+        <div className="space-y-2">
+          <input
+            type="range"
+            min={0}
+            max={maxPossiblePrice}
+            step={50}
+            value={priceLimit}
+            onChange={(e) => handlePriceChange(Number(e.target.value))}
+            onMouseUp={handlePriceCommit}
+            onTouchEnd={handlePriceCommit}
+            className="w-full accent-[#cc272d] cursor-pointer"
+          />
+          <div className="flex items-center justify-between text-xs font-bold text-gray-700">
+            <span>৳0</span>
+            <span className="text-[#cc272d]">৳{priceLimit.toLocaleString()}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 4. BRANDS Checkboxes */}
+      {availableBrands.length > 0 && (
+        <div className="border-t border-gray-100 pt-5 space-y-3">
+          <h3 className="text-xs sm:text-sm font-black text-gray-900 uppercase tracking-wider">
+            BRANDS
+          </h3>
+          <div className="space-y-2 max-h-48 overflow-y-auto no-scrollbar">
+            {availableBrands.map((brand) => {
+              const checked = selectedBrands.includes(brand);
+              return (
+                <label
+                  key={brand}
+                  className="flex items-center gap-2.5 text-xs text-gray-700 hover:text-[#cc272d] cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={() => handleBrandToggle(brand)}
+                    className="w-4 h-4 rounded text-[#cc272d] focus:ring-[#cc272d] border-gray-300"
+                  />
+                  <span>{brand}</span>
+                </label>
+              );
+            })}
+          </div>
         </div>
       )}
     </div>
-  );
-
-  return (
-    <>
-      {/* Mobile Toggle Button */}
-      <div className="lg:hidden mb-4">
-        <button
-          onClick={() => setIsOpenMobile(!isOpenMobile)}
-          className="w-full flex items-center justify-center gap-2 py-2 px-4 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-700 shadow-sm"
-        >
-          <Filter className="w-4 h-4 text-[#cc272d]" />
-          <span>Filters & Categories</span>
-        </button>
-
-        {isOpenMobile && (
-          <div className="bg-white rounded-2xl border border-gray-100 p-5 mt-3 shadow-lg">
-            {filterContent}
-          </div>
-        )}
-      </div>
-
-      {/* Desktop Sidebar */}
-      <div className="hidden lg:block bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-        {filterContent}
-      </div>
-    </>
   );
 }

@@ -1,9 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { X, Plus, Minus, Trash2, ShoppingBag, ArrowRight } from 'lucide-react';
+import { Plus, Minus, Trash2, ShoppingBag, ArrowRight } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { formatPrice } from '@/lib/price-parser';
 
@@ -12,11 +12,35 @@ export default function CartDrawer() {
     items,
     updateQuantity,
     removeFromCart,
-    clearCart,
+    addToCart,
     subtotal,
     isCartDrawerOpen,
     setIsCartDrawerOpen,
   } = useCart();
+
+  const [suggestedProducts, setSuggestedProducts] = useState<any[]>([]);
+
+  // Fetch "You May Also Like" suggestions when drawer opens
+  useEffect(() => {
+    if (!isCartDrawerOpen) return;
+
+    let mounted = true;
+    fetch('/api/products?limit=6')
+      .then((res) => res.json())
+      .then((data) => {
+        if (mounted && data?.products) {
+          // Filter out items already in cart
+          const cartIds = new Set(items.map((i) => i.productId));
+          const available = data.products.filter((p: any) => !cartIds.has(p.id));
+          setSuggestedProducts(available.slice(0, 4));
+        }
+      })
+      .catch(() => {});
+
+    return () => {
+      mounted = false;
+    };
+  }, [isCartDrawerOpen, items]);
 
   if (!isCartDrawerOpen) return null;
 
@@ -28,42 +52,40 @@ export default function CartDrawer() {
         onClick={() => setIsCartDrawerOpen(false)}
       />
 
-      <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
+      <div className="fixed inset-y-0 right-0 max-w-full flex pl-6 sm:pl-10">
         <div className="w-screen max-w-md bg-white shadow-2xl flex flex-col">
-          {/* Header */}
+          {/* Header: "SHOPPING CART" with "Close →" control */}
           <div className="p-4 sm:p-5 border-b border-gray-100 flex items-center justify-between bg-white">
-            <div className="flex items-center gap-2">
-              <ShoppingBag className="w-5 h-5 text-[#cc272d]" />
-              <h2 className="text-base sm:text-lg font-black text-gray-900">
-                Shopping Cart ({items.length})
-              </h2>
-            </div>
+            <h2 className="text-sm sm:text-base font-black tracking-wider uppercase text-gray-950">
+              SHOPPING CART
+            </h2>
             <button
               onClick={() => setIsCartDrawerOpen(false)}
-              className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition"
+              className="flex items-center gap-1 text-xs font-bold text-gray-600 hover:text-[#cc272d] transition group"
               aria-label="Close Cart"
             >
-              <X className="w-5 h-5" />
+              <span>Close</span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
             </button>
           </div>
 
-          {/* Items List */}
+          {/* Cart Items List */}
           <div className="flex-1 overflow-y-auto p-4 sm:p-5 divide-y divide-gray-100">
             {items.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-4">
-                <div className="w-16 h-16 rounded-full bg-rose-50 flex items-center justify-center text-[#cc272d]">
-                  <ShoppingBag className="w-8 h-8" />
+                <div className="w-20 h-20 rounded-full bg-rose-50 flex items-center justify-center text-[#cc272d]">
+                  <ShoppingBag className="w-10 h-10" />
                 </div>
-                <h3 className="text-base font-bold text-gray-900">Your cart is currently empty</h3>
-                <p className="text-xs sm:text-sm text-gray-500 max-w-xs">
-                  Discover our premium beauty collection and add items to your cart.
+                <h3 className="text-base font-bold text-gray-900">No items in your cart!</h3>
+                <p className="text-xs text-gray-500 max-w-xs">
+                  Your beauty cart is looking a little empty. Browse our catalog and treat yourself!
                 </p>
                 <Link
                   href="/shop"
                   onClick={() => setIsCartDrawerOpen(false)}
-                  className="px-6 py-2.5 rounded-xl bg-[#cc272d] text-white text-xs sm:text-sm font-bold hover:bg-red-700 transition shadow-md"
+                  className="px-6 py-2.5 rounded-xl bg-[#cc272d] hover:bg-red-700 text-white text-xs sm:text-sm font-bold transition shadow-md shadow-red-600/20"
                 >
-                  Start Shopping
+                  Continue Shopping
                 </Link>
               </div>
             ) : (
@@ -95,7 +117,7 @@ export default function CartDrawer() {
                           </h4>
                           <button
                             onClick={() => removeFromCart(item.productId, item.variant)}
-                            className="text-gray-400 hover:text-red-600 transition"
+                            className="text-gray-400 hover:text-[#cc272d] transition"
                             aria-label="Remove item"
                             title="Remove"
                           >
@@ -114,7 +136,7 @@ export default function CartDrawer() {
                         </div>
                       </div>
 
-                      {/* Quantity Controls */}
+                      {/* Quantity Stepper */}
                       <div className="flex items-center gap-2 mt-2">
                         <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-white">
                           <button
@@ -152,41 +174,77 @@ export default function CartDrawer() {
             )}
           </div>
 
-          {/* Footer & Actions */}
+          {/* "You May Also Like" Row Above Footer */}
+          {items.length > 0 && suggestedProducts.length > 0 && (
+            <div className="border-t border-gray-100 bg-gray-50/70 p-3.5">
+              <h4 className="text-[11px] font-black text-gray-800 uppercase tracking-wider mb-2.5">
+                You May Also Like
+              </h4>
+              <div className="flex gap-2.5 overflow-x-auto no-scrollbar pb-1">
+                {suggestedProducts.map((p) => {
+                  const pImg =
+                    p.images?.[0] ||
+                    'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=500';
+                  return (
+                    <div
+                      key={p.id}
+                      className="w-36 flex-shrink-0 bg-white rounded-xl border border-gray-200 p-2 flex flex-col justify-between shadow-2xs"
+                    >
+                      <div className="relative w-full h-20 bg-gray-50 rounded-lg overflow-hidden mb-1.5">
+                        <Image src={pImg} alt={p.name} fill className="object-contain p-1" />
+                      </div>
+                      <p className="text-[11px] font-bold text-gray-900 line-clamp-1 mb-1">
+                        {p.name}
+                      </p>
+                      <div className="flex items-center justify-between mt-auto pt-1 border-t border-gray-100">
+                        <span className="text-[11px] font-black text-[#cc272d]">
+                          {formatPrice(p.price)}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            addToCart(
+                              {
+                                productId: p.id,
+                                name: p.name,
+                                slug: p.slug,
+                                price: p.price,
+                                regularPrice: p.regularPrice,
+                                image: pImg,
+                                sku: p.sku,
+                                stock: p.stock,
+                              },
+                              1
+                            )
+                          }
+                          className="px-2 py-0.5 rounded-full bg-[#cc272d] hover:bg-red-700 text-white text-[10px] font-bold transition active:scale-95"
+                          title="Add to Cart"
+                        >
+                          + Add
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Footer: "Total: ৳X" + ONE full-width red "CHECKOUT" button */}
           {items.length > 0 && (
-            <div className="p-4 sm:p-5 border-t border-gray-200 bg-gray-50 space-y-3">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-gray-600 font-bold">Subtotal:</span>
-                <span className="text-base font-black text-gray-900">
-                  {formatPrice(subtotal)}
-                </span>
+            <div className="p-4 sm:p-5 border-t border-gray-200 bg-white space-y-3">
+              <div className="flex items-center justify-between text-base font-black">
+                <span className="text-gray-900">Total:</span>
+                <span className="text-[#cc272d] text-lg">{formatPrice(subtotal)}</span>
               </div>
 
-              <div className="flex items-center justify-between gap-2 pt-1">
-                <button
-                  onClick={clearCart}
-                  className="py-2.5 px-3 rounded-lg border border-red-200 text-[#cc272d] hover:bg-red-50 text-xs font-bold transition"
-                >
-                  Clear
-                </button>
-
-                <Link
-                  href="/cart"
-                  onClick={() => setIsCartDrawerOpen(false)}
-                  className="py-2.5 px-3 rounded-lg border border-gray-300 hover:bg-gray-100 text-gray-700 text-xs font-bold transition"
-                >
-                  View Cart
-                </Link>
-
-                <Link
-                  href="/checkout"
-                  onClick={() => setIsCartDrawerOpen(false)}
-                  className="flex-1 py-2.5 px-4 rounded-xl bg-[#cc272d] hover:bg-red-700 text-white text-xs sm:text-sm font-black flex items-center justify-center gap-1.5 shadow-md shadow-red-600/25 transition active:scale-95"
-                >
-                  <span>Checkout</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
+              <Link
+                href="/checkout"
+                onClick={() => setIsCartDrawerOpen(false)}
+                className="w-full py-3.5 px-4 rounded-xl bg-[#cc272d] hover:bg-red-700 text-white text-sm font-black flex items-center justify-center gap-2 shadow-lg shadow-red-600/25 transition active:scale-95 uppercase tracking-wider"
+              >
+                <span>CHECKOUT</span>
+              </Link>
             </div>
           )}
         </div>

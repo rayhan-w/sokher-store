@@ -2,7 +2,6 @@ import React from 'react';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import prisma from '@/lib/prisma';
-import AnnouncementBar from '@/components/AnnouncementBar';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductDetailClient from './ProductDetailClient';
@@ -68,8 +67,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
     notFound();
   }
 
-  // Fetch Settings, Categories, and Related Products
-  const [settings, categories, relatedProducts] = await Promise.all([
+  // Fetch Settings, Categories, and Related Products (up to 12)
+  const categoryIds = product.categories.map((c) => c.categoryId);
+
+  const [settings, categories, primaryRelated] = await Promise.all([
     prisma.storeSetting.findUnique({ where: { id: 'default' } }),
     prisma.category.findMany({
       orderBy: { order: 'asc' },
@@ -84,11 +85,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
         NOT: { id: product.id },
         categories: {
           some: {
-            categoryId: { in: product.categories.map((c) => c.categoryId) },
+            categoryId: { in: categoryIds },
           },
         },
       },
-      take: 4,
+      take: 12,
       include: {
         categories: { include: { category: true } },
         reviews: { select: { rating: true } },
@@ -96,9 +97,27 @@ export default async function ProductPage({ params }: ProductPageProps) {
     }),
   ]);
 
+  // If fewer than 12 related in same category, supplement with other active products
+  let relatedProducts = primaryRelated;
+  if (relatedProducts.length < 12) {
+    const existingIds = [product.id, ...relatedProducts.map((p) => p.id)];
+    const additional = await prisma.product.findMany({
+      where: {
+        status: 'ACTIVE',
+        NOT: { id: { in: existingIds } },
+      },
+      take: 12 - relatedProducts.length,
+      include: {
+        categories: { include: { category: true } },
+        reviews: { select: { rating: true } },
+      },
+    });
+    relatedProducts = [...relatedProducts, ...additional];
+  }
+
   const defaultSettings = settings || {
     storeName: 'Sokher Store',
-    announcementText: 'Free Shipping on orders over ৳999',
+    announcementText: null,
     freeDeliveryThreshold: 999,
   };
 
@@ -111,12 +130,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
     subcategories: c.subcategories,
   }));
 
-  const formattedRelated = relatedProducts.map((p) => {
-    const totalRatings = p.reviews.length;
-    const avgRating = totalRatings > 0
-      ? Math.round((p.reviews.reduce((acc, r) => acc + r.rating, 0) / totalRatings) * 10) / 10
-      : 4.8;
-
+  const formatProduct = (p: any) => {
     return {
       id: p.id,
       name: p.name,
@@ -127,42 +141,34 @@ export default async function ProductPage({ params }: ProductPageProps) {
       stock: p.stock,
       badge: p.badge,
       images: JSON.parse(p.images || '[]'),
-      rating: avgRating,
-      reviewCount: totalRatings,
+      categories: p.categories.map((c: any) => c.category),
     };
-  });
+  };
 
-  const parsedImages = JSON.parse(product.images || '[]');
-  const parsedSpecs = product.specification ? JSON.parse(product.specification) : null;
-  const parsedVariants = product.variants ? JSON.parse(product.variants) : null;
+  const formattedProduct = {
+    ...formatProduct(product),
+    description: product.description,
+    specification: product.specification,
+    variants: product.variants ? JSON.parse(product.variants) : [],
+    reviews: product.reviews,
+    primaryCategory: product.categories?.[0]?.category || null,
+  };
 
-  const totalReviews = product.reviews.length;
-  const avgRating = totalReviews > 0
-    ? Math.round((product.reviews.reduce((acc, r) => acc + r.rating, 0) / totalReviews) * 10) / 10
-    : 4.8;
+  const formattedRelated = relatedProducts.map(formatProduct);
 
   return (
     <div className="min-h-screen bg-[#FFFDFD] flex flex-col">
-      <AnnouncementBar settings={defaultSettings} />
       <Header settings={defaultSettings as any} categories={formattedCategories} />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1 w-full">
         <ProductDetailClient
-          product={{
-            ...product,
-            images: parsedImages,
-            specification: parsedSpecs,
-            variants: parsedVariants,
-            rating: avgRating,
-            reviewCount: totalReviews,
-            categories: product.categories.map((c) => c.category),
-          }}
+          product={formattedProduct}
           relatedProducts={formattedRelated}
-          settings={defaultSettings as any}
+          settings={defaultSettings}
         />
       </main>
 
-      <Footer settings={defaultSettings as any} />
+      <Footer settings={defaultSettings as any} categories={formattedCategories} />
     </div>
   );
 }

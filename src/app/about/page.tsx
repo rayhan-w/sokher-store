@@ -1,14 +1,12 @@
 import React from 'react';
 import Link from 'next/link';
 import { ShieldCheck, Heart, Sparkles, Award } from 'lucide-react';
-import AnnouncementBar from '@/components/AnnouncementBar';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-[#FFFDFD] flex flex-col">
-      <AnnouncementBar settings={{ isAnnouncementActive: true, freeDeliveryThreshold: 999 }} />
       <Header settings={{ storeName: 'Sokher Store' }} categories={[]} />
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-12 flex-1 w-full space-y-8">

@@ -1,7 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
 import prisma from '@/lib/prisma';
-import AnnouncementBar from '@/components/AnnouncementBar';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
@@ -11,21 +10,26 @@ export const revalidate = 0;
 
 interface ShopPageProps {
   searchParams: {
-    category?: string;
-    subcategory?: string;
     search?: string;
     sort?: string;
-    minPrice?: string;
+    flag?: string | string[];
+    brand?: string | string[];
     maxPrice?: string;
-    badge?: string;
+    page?: string;
   };
 }
 
 export default async function ShopPage({ searchParams }: ShopPageProps) {
-  const { category, subcategory, search, sort = 'newest', minPrice, maxPrice, badge } = searchParams;
+  const { search, sort = 'default', flag, brand, maxPrice, page = '1' } = searchParams;
+  const currentPage = Math.max(1, parseInt(page, 10) || 1);
+  const pageSize = 16;
 
-  // Fetch Settings & Categories
-  const [settings, categories] = await Promise.all([
+  // Extract array of flags & brands
+  const flags = Array.isArray(flag) ? flag : flag ? [flag] : [];
+  const brands = Array.isArray(brand) ? brand : brand ? [brand] : [];
+
+  // Fetch Settings & Categories for header
+  const [settings, categories, allActiveProducts] = await Promise.all([
     prisma.storeSetting.findUnique({ where: { id: 'default' } }),
     prisma.category.findMany({
       orderBy: { order: 'asc' },
@@ -36,30 +40,34 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
         },
       },
     }),
+    prisma.product.findMany({
+      where: { status: 'ACTIVE' },
+      select: { price: true, specification: true },
+    }),
   ]);
+
+  // Determine Max Price across catalog
+  const highestCatalogPrice = allActiveProducts.reduce(
+    (max, p) => (p.price > max ? p.price : max),
+    2000
+  );
+  const roundedMaxPrice = Math.ceil(highestCatalogPrice / 500) * 500;
+
+  // Extract unique brands from specifications
+  const brandSet = new Set<string>();
+  allActiveProducts.forEach((p) => {
+    if (p.specification) {
+      try {
+        const spec = typeof p.specification === 'string' ? JSON.parse(p.specification) : p.specification;
+        const b = spec?.Brand || spec?.brand;
+        if (b && typeof b === 'string') brandSet.add(b.trim());
+      } catch {}
+    }
+  });
+  const availableBrands = Array.from(brandSet).sort();
 
   // Build Where clause for products
   const where: any = { status: 'ACTIVE' };
-
-  if (category) {
-    where.categories = {
-      some: {
-        category: {
-          slug: category,
-        },
-      },
-    };
-  }
-
-  if (subcategory) {
-    where.subcategory = {
-      slug: subcategory,
-    };
-  }
-
-  if (badge) {
-    where.badge = badge;
-  }
 
   if (search) {
     const q = search.trim();
@@ -70,49 +78,66 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
     ];
   }
 
-  if (minPrice || maxPrice) {
-    where.price = {};
-    if (minPrice) where.price.gte = parseFloat(minPrice);
-    if (maxPrice) where.price.lte = parseFloat(maxPrice);
+  if (flags.length > 0) {
+    const orConditions: any[] = [];
+    if (flags.includes('Best Selling')) {
+      orConditions.push(
+        { badge: { in: ['Best Selling', 'Best Seller', 'HOT'] } },
+        { isFeatured: true }
+      );
+    }
+    if (flags.includes('New Arrival')) {
+      orConditions.push({ badge: { in: ['New Arrival', 'New', 'NEW_ARRIVAL'] } });
+    }
+    if (orConditions.length > 0) {
+      where.OR = where.OR ? [...where.OR, ...orConditions] : orConditions;
+    }
   }
 
-  // Sort
+  if (maxPrice) {
+    where.price = { lte: parseFloat(maxPrice) };
+  }
+
+  if (brands.length > 0) {
+    where.AND = brands.map((b) => ({
+      specification: { contains: b },
+    }));
+  }
+
+  // Sort: Default, Best Selling, Latest, Price Low to High, Price High to Low
   let orderBy: any = { createdAt: 'desc' };
-  if (sort === 'price-low') orderBy = { price: 'asc' };
-  if (sort === 'price-high') orderBy = { price: 'desc' };
-  if (sort === 'popular') orderBy = { viewCount: 'desc' };
+  if (sort === 'best-selling') orderBy = { viewCount: 'desc' };
+  if (sort === 'latest') orderBy = { createdAt: 'desc' };
+  if (sort === 'price-low-to-high') orderBy = { price: 'asc' };
+  if (sort === 'price-high-to-low') orderBy = { price: 'desc' };
 
-  const products = await prisma.product.findMany({
-    where,
-    orderBy,
-    include: {
-      categories: { include: { category: true } },
-      subcategory: true,
-      reviews: { select: { rating: true } },
-    },
-  });
+  const [totalCount, products] = await Promise.all([
+    prisma.product.count({ where }),
+    prisma.product.findMany({
+      where,
+      orderBy,
+      skip: (currentPage - 1) * pageSize,
+      take: pageSize,
+      include: {
+        categories: { include: { category: true } },
+      },
+    }),
+  ]);
 
-  const formattedProducts = products.map((p) => {
-    const totalRatings = p.reviews.length;
-    const avgRating = totalRatings > 0
-      ? Math.round((p.reviews.reduce((acc, r) => acc + r.rating, 0) / totalRatings) * 10) / 10
-      : 4.8;
+  const totalPages = Math.ceil(totalCount / pageSize);
 
-    return {
-      id: p.id,
-      name: p.name,
-      slug: p.slug,
-      sku: p.sku,
-      price: p.price,
-      regularPrice: p.regularPrice,
-      stock: p.stock,
-      badge: p.badge,
-      images: JSON.parse(p.images || '[]'),
-      rating: avgRating,
-      reviewCount: totalRatings > 0 ? totalRatings : 500,
-      categories: p.categories.map((c) => c.category),
-    };
-  });
+  const formattedProducts = products.map((p) => ({
+    id: p.id,
+    name: p.name,
+    slug: p.slug,
+    sku: p.sku,
+    price: p.price,
+    regularPrice: p.regularPrice,
+    stock: p.stock,
+    badge: p.badge,
+    images: JSON.parse(p.images || '[]'),
+    categories: p.categories.map((c) => c.category),
+  }));
 
   const formattedCategories = categories.map((c) => ({
     id: c.id,
@@ -125,83 +150,118 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
 
   const defaultSettings = settings || {
     storeName: 'Sokher Store',
-    announcementText: 'Free Shipping on orders over ৳999',
     freeDeliveryThreshold: 999,
+  };
+
+  const createPageUrl = (pageNum: number) => {
+    const params = new URLSearchParams();
+    if (search) params.set('search', search);
+    if (sort) params.set('sort', sort);
+    if (maxPrice) params.set('maxPrice', maxPrice);
+    flags.forEach((f) => params.append('flag', f));
+    brands.forEach((b) => params.append('brand', b));
+    params.set('page', pageNum.toString());
+    return `/shop?${params.toString()}`;
   };
 
   return (
     <div className="min-h-screen bg-[#FFFDFD] flex flex-col">
-      <AnnouncementBar settings={defaultSettings} />
       <Header settings={defaultSettings as any} categories={formattedCategories} />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
-        {/* Breadcrumb */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1 w-full">
+        {/* Breadcrumb: Home > Shop */}
         <nav className="text-xs text-gray-500 mb-6 flex items-center gap-2">
-          <Link href="/" className="hover:text-[#cc272d]">Home</Link>
-          <span>/</span>
+          <Link href="/" className="hover:text-[#cc272d] transition">
+            Home
+          </Link>
+          <span>&gt;</span>
           <span className="font-semibold text-gray-900">Shop</span>
-          {category && (
-            <>
-              <span>/</span>
-              <span className="font-semibold text-[#cc272d] capitalize">{category.replace('-', ' ')}</span>
-            </>
-          )}
         </nav>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Sidebar Filters */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
+          {/* Sidebar: PRODUCT FLAG -> PRICE RANGE -> BRANDS */}
           <aside className="lg:col-span-1">
-            <ShopFilterClient categories={formattedCategories} currentCategory={category} currentSubcategory={subcategory} />
+            <ShopFilterClient
+              isCategoryPage={false}
+              maxPossiblePrice={roundedMaxPrice}
+              availableBrands={availableBrands}
+              basePath="/shop"
+            />
           </aside>
 
           {/* Product Grid & Controls */}
           <section className="lg:col-span-3">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 mb-6 border-b border-gray-100">
-              <div>
-                <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
-                  {category ? category.replace('-', ' ').toUpperCase() : 'All Beauty Products'}
-                </h1>
-                <p className="text-xs text-gray-500 mt-0.5">
-                  Showing {formattedProducts.length} results
-                </p>
-              </div>
+            {/* Top Bar: Result count ("X results") + Sort dropdown */}
+            <div className="flex items-center justify-between pb-4 mb-6 border-b border-gray-100">
+              <p className="text-xs sm:text-sm font-bold text-gray-800">
+                {totalCount} results
+              </p>
 
-              {/* Sort selector */}
+              {/* Exact Shop Sort Options */}
               <div className="flex items-center gap-2 text-xs">
                 <span className="text-gray-500 font-medium">Sort by:</span>
-                <select
-                  defaultValue={sort}
-                  className="bg-white border border-gray-200 rounded-lg py-1.5 px-2.5 text-xs font-medium text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#cc272d]"
-                >
-                  <option value="newest">Newest Arrivals</option>
-                  <option value="popular">Best Selling / Popular</option>
-                  <option value="price-low">Price: Low to High</option>
-                  <option value="price-high">Price: High to Low</option>
-                </select>
+                <form method="GET" action="/shop" className="inline">
+                  {flags.map((f, i) => (
+                    <input key={i} type="hidden" name="flag" value={f} />
+                  ))}
+                  {brands.map((b, i) => (
+                    <input key={i} type="hidden" name="brand" value={b} />
+                  ))}
+                  {maxPrice && <input type="hidden" name="maxPrice" value={maxPrice} />}
+                  <select
+                    name="sort"
+                    defaultValue={sort}
+                    // Trigger form submit on change
+                    onChange={(e) => e.target.form?.submit()}
+                    className="bg-white border border-gray-200 rounded-lg py-1.5 px-3 text-xs font-semibold text-gray-800 focus:outline-none focus:border-[#cc272d] cursor-pointer"
+                  >
+                    <option value="default">Default</option>
+                    <option value="best-selling">Best Selling</option>
+                    <option value="latest">Latest</option>
+                    <option value="price-low-to-high">Price Low to High</option>
+                    <option value="price-high-to-low">Price High to Low</option>
+                  </select>
+                </form>
               </div>
             </div>
 
-            {/* Products Grid */}
+            {/* Product Grid: 4 per row on desktop (currently 3) */}
             {formattedProducts.length === 0 ? (
-              <div className="bg-white rounded-3xl border border-dashed border-gray-200 p-16 text-center space-y-4">
-                <div className="w-16 h-16 rounded-full bg-rose-50 text-[#cc272d] flex items-center justify-center mx-auto text-xl font-bold">
-                  !
-                </div>
-                <h3 className="text-base font-bold text-gray-900">No Products Found</h3>
-                <p className="text-xs sm:text-sm text-gray-500 max-w-sm mx-auto">
-                  No products match your selected filters or search keyword. Try clearing filters or searching for something else.
+              <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center space-y-3">
+                <h3 className="text-sm font-bold text-gray-900">No Products Found</h3>
+                <p className="text-xs text-gray-500">
+                  No products match your selected filters. Try adjusting your filter selection.
                 </p>
                 <Link
                   href="/shop"
-                  className="inline-block px-6 py-2.5 rounded-full bg-[#cc272d] text-white text-xs font-semibold hover:bg-red-700 transition"
+                  className="inline-block px-5 py-2 rounded-lg bg-[#cc272d] text-white text-xs font-bold hover:bg-red-700 transition"
                 >
                   Clear Filters
                 </Link>
               </div>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3 gap-4 sm:gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
                 {formattedProducts.map((p) => (
                   <ProductCard key={p.id} product={p} />
+                ))}
+              </div>
+            )}
+
+            {/* Numbered Pagination: 1 2 3 ... 16 per page */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-1.5 mt-10">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
+                  <Link
+                    key={num}
+                    href={createPageUrl(num)}
+                    className={`w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold transition ${
+                      num === currentPage
+                        ? 'bg-[#cc272d] text-white shadow-xs'
+                        : 'bg-white border border-gray-200 text-gray-700 hover:border-[#cc272d] hover:text-[#cc272d]'
+                    }`}
+                  >
+                    {num}
+                  </Link>
                 ))}
               </div>
             )}
@@ -209,7 +269,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
         </div>
       </main>
 
-      <Footer settings={defaultSettings as any} />
+      <Footer settings={defaultSettings as any} categories={formattedCategories} />
     </div>
   );
 }

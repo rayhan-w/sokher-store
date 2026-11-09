@@ -91,6 +91,29 @@ export default function HeroSlider({ slides = [], promoBanner }: HeroSliderProps
               priority
               className="object-cover object-center"
             />
+
+            {/* Headline and Offer Badge Overlay (Full Bengali Unicode Text Rendering) */}
+            {(slide.title || slide.badge || slide.subtitle) && (
+              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent sm:bg-gradient-to-r sm:from-black/70 sm:via-black/25 sm:to-transparent flex items-end sm:items-center p-5 sm:p-8 z-10 pointer-events-none">
+                <div className="max-w-md text-white space-y-1.5">
+                  {slide.badge && (
+                    <span className="inline-block px-2.5 py-1 bg-[#cc272d] text-white text-[11px] font-black rounded-md uppercase tracking-wider shadow-sm">
+                      {slide.badge}
+                    </span>
+                  )}
+                  {slide.title && (
+                    <h2 className="text-base sm:text-2xl lg:text-3xl font-black text-white leading-snug drop-shadow-md">
+                      {slide.title}
+                    </h2>
+                  )}
+                  {slide.subtitle && (
+                    <p className="text-xs sm:text-sm text-gray-200 line-clamp-2 drop-shadow-sm font-medium">
+                      {slide.subtitle}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
           </Link>
 
           {/* Left Arrow Button */}

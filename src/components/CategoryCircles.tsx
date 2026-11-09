@@ -63,18 +63,18 @@ export default function CategoryCircles({ categories = [] }: CategoryCirclesProp
               href={`/category/${cat.slug}`}
               className="flex-shrink-0 group flex flex-col items-center focus:outline-none"
             >
-              {/* Squircle Card (Rounded-3xl white card with soft shadow) */}
-              <div className="w-24 sm:w-28 h-24 sm:h-28 rounded-3xl bg-white shadow-xs border border-gray-100/90 flex items-center justify-center p-3.5 group-hover:border-red-200 group-hover:shadow-md transition-all duration-300">
-                <div className="relative w-full h-full">
+              {/* White rounded card with CIRCULAR category image centred */}
+              <div className="w-24 sm:w-28 h-24 sm:h-28 rounded-2xl sm:rounded-3xl bg-white shadow-xs border border-gray-100 flex items-center justify-center p-3 group-hover:border-red-200 group-hover:shadow-md transition-all duration-300">
+                <div className="relative w-14 sm:w-16 h-14 sm:h-16 rounded-full overflow-hidden bg-rose-50/40 flex items-center justify-center">
                   {cat.image ? (
                     <Image
                       src={cat.image}
                       alt={cat.name}
                       fill
-                      className="object-contain p-1 group-hover:scale-108 transition-transform duration-300"
+                      className="object-cover rounded-full group-hover:scale-108 transition-transform duration-300"
                     />
                   ) : (
-                    <div className="w-full h-full rounded-2xl bg-rose-50 flex items-center justify-center text-lg font-black text-[#cc272d]">
+                    <div className="w-full h-full rounded-full bg-rose-50 flex items-center justify-center text-base sm:text-lg font-black text-[#cc272d]">
                       {cat.name.charAt(0)}
                     </div>
                   )}

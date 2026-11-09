@@ -1,23 +1,20 @@
 import React from 'react';
-import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
 import prisma from '@/lib/prisma';
-import AnnouncementBar from '@/components/AnnouncementBar';
 import Header from '@/components/Header';
 import HeroSlider from '@/components/HeroSlider';
-import TrustBar from '@/components/TrustBar';
 import CategoryCircles from '@/components/CategoryCircles';
-import ProductCard from '@/components/ProductCard';
+import ProductCarousel from '@/components/ProductCarousel';
+import BrandRow from '@/components/BrandRow';
 import PromoBanner from '@/components/PromoBanner';
-import FlashSaleSection from '@/components/FlashSaleSection';
+import JustForYou from '@/components/JustForYou';
+import Testimonials from '@/components/Testimonials';
 import Footer from '@/components/Footer';
-import FloatingCartTab from '@/components/FloatingCartTab';
 
 export const revalidate = 0; // Dynamic server-rendering for single source of truth
 
 export default async function HomePage() {
-  // Fetch everything from Shared Database (Single Source of Truth)
-  const [settings, categories, featuredProducts, banners, activeFlashSale] = await Promise.all([
+  // 1. Fetch Store Settings, Categories, Banners, and Testimonials from Shared Database
+  const [settings, categories, banners, reviews] = await Promise.all([
     prisma.storeSetting.findUnique({ where: { id: 'default' } }),
     prisma.category.findMany({
       orderBy: { order: 'asc' },
@@ -25,58 +22,101 @@ export default async function HomePage() {
         subcategories: true,
         productCategories: {
           where: { product: { status: 'ACTIVE' } },
+          include: {
+            product: {
+              include: {
+                categories: { include: { category: true } },
+                reviews: { select: { rating: true } },
+              },
+            },
+          },
+          take: 10,
         },
-      },
-    }),
-    prisma.product.findMany({
-      where: {
-        status: 'ACTIVE',
-        isFeatured: true,
-      },
-      orderBy: { createdAt: 'desc' },
-      take: 12,
-      include: {
-        categories: { include: { category: true } },
-        reviews: { select: { rating: true } },
       },
     }),
     prisma.banner.findMany({
       where: { isActive: true },
       orderBy: { order: 'asc' },
     }),
-    prisma.flashSale.findFirst({
-      where: {
-        isActive: true,
-        startTime: { lte: new Date() },
-        endTime: { gt: new Date() },
-      },
-      include: {
-        items: {
-          include: {
-            product: {
-              include: { categories: { include: { category: true } } },
-            },
-          },
-        },
-      },
+    prisma.review.findMany({
+      where: { status: 'APPROVED', rating: { gte: 4 } },
+      orderBy: { createdAt: 'desc' },
+      take: 10,
     }),
   ]);
+
+  // 2. Fetch Top Selling Products (max 10 for carousel)
+  const topSellingRaw = await prisma.product.findMany({
+    where: {
+      status: 'ACTIVE',
+      OR: [
+        { badge: { in: ['Best Selling', 'Best Seller', 'HOT'] } },
+        { isFeatured: true },
+      ],
+    },
+    orderBy: { viewCount: 'desc' },
+    take: 10,
+    include: {
+      categories: { include: { category: true } },
+      reviews: { select: { rating: true } },
+    },
+  });
+
+  // Fallback if topSellingRaw is fewer than 4 products
+  const topSellingProducts =
+    topSellingRaw.length >= 4
+      ? topSellingRaw
+      : await prisma.product.findMany({
+          where: { status: 'ACTIVE' },
+          orderBy: { createdAt: 'desc' },
+          take: 10,
+          include: {
+            categories: { include: { category: true } },
+            reviews: { select: { rating: true } },
+          },
+        });
+
+  // 3. Fetch "Just For You" Initial 10 Products
+  const justForYouRaw = await prisma.product.findMany({
+    where: { status: 'ACTIVE' },
+    orderBy: { createdAt: 'desc' },
+    take: 10,
+    include: {
+      categories: { include: { category: true } },
+      reviews: { select: { rating: true } },
+    },
+  });
 
   const defaultSettings = settings || {
     storeName: 'Sokher Store',
     tagline: 'Your Beauty, Our Passion',
     logoUrl: '/images/logo-icon.jpg',
-    announcementText: 'Fast Cash on Delivery all over Bangladesh | Free Shipping on orders over ৳999!',
+    announcementText: null,
     isAnnouncementActive: false,
     freeDeliveryThreshold: 999,
     contactPhone: '+880 1700-000000',
     contactEmail: 'support@sokherstore.com',
     whatsappNumber: '+880 1700-000000',
-    trustBarItems: null,
   };
 
   const heroSlides = banners.filter((b) => b.type === 'HERO_SLIDER');
   const promoBanner = banners.find((b) => b.type === 'PROMO_BANNER');
+
+  const formatProduct = (p: any) => ({
+    id: p.id,
+    name: p.name,
+    slug: p.slug,
+    sku: p.sku,
+    price: p.price,
+    regularPrice: p.regularPrice,
+    stock: p.stock,
+    badge: p.badge || (p.isFeatured ? 'Best Selling' : null),
+    images: JSON.parse(p.images || '[]'),
+    categories: p.categories?.map((c: any) => c.category) || [],
+  });
+
+  const formattedTopSelling = topSellingProducts.map(formatProduct);
+  const formattedJustForYou = justForYouRaw.map(formatProduct);
 
   const formattedCategories = categories.map((c) => ({
     id: c.id,
@@ -85,98 +125,74 @@ export default async function HomePage() {
     image: c.image,
     productCount: c.productCategories.length,
     subcategories: c.subcategories,
+    products: c.productCategories.map((pc) => formatProduct(pc.product)),
   }));
 
-  const formattedFeaturedProducts = featuredProducts.map((p) => {
-    const totalRatings = p.reviews.length;
-    const avgRating =
-      totalRatings > 0
-        ? Math.round((p.reviews.reduce((acc, r) => acc + r.rating, 0) / totalRatings) * 10) / 10
-        : 4.8;
+  // Filter categories that have at least 1 product
+  const categorySections = formattedCategories.filter((c) => c.products.length > 0);
 
-    return {
-      id: p.id,
-      name: p.name,
-      slug: p.slug,
-      sku: p.sku,
-      price: p.price,
-      regularPrice: p.regularPrice,
-      stock: p.stock,
-      badge: p.badge || 'Best Selling',
-      images: JSON.parse(p.images || '[]'),
-      rating: avgRating,
-      reviewCount: totalRatings > 0 ? totalRatings : 850,
-      categories: p.categories.map((c) => c.category),
-    };
-  });
+  const formattedReviews = reviews.map((r) => ({
+    id: r.id,
+    customerName: r.customerName || 'Verified Customer',
+    rating: r.rating,
+    comment: r.comment,
+    isVerified: r.isVerified,
+  }));
 
   return (
     <main className="min-h-screen bg-[#FFFDFD] pb-14 sm:pb-0 relative">
-      {/* 1. Announcement Bar (Hidden on Mobile to match screenshot) */}
-      <AnnouncementBar settings={defaultSettings as any} />
-
-      {/* 2. Header (Clean mobile view: [☰]  [SOKHER STORE]  [🛒 0]) */}
+      {/* 1. Header (Sticky navigation, logo left, centered search, 5 actions right) */}
       <Header settings={defaultSettings as any} categories={formattedCategories} />
 
-      {/* 3. Hero Banner Slider (2-column on desktop with promo card, 16:9 on mobile) */}
+      {/* 2. Hero Section: 2/3 Auto-playing Slider + 1/3 Side Banner */}
       <HeroSlider slides={heroSlides} promoBanner={promoBanner} />
 
-      {/* 4. Featured Categories (Squircle cards with arrow) */}
+      {/* 3. Section 1: Featured Categories (White rounded cards with circular image centered) */}
       <CategoryCircles categories={formattedCategories} />
 
-      {/* 5. Floating Side Cart Tab (Right edge pill) */}
-      <FloatingCartTab />
+      {/* 4. Section 2: Top Selling Products (Carousel with arrows) */}
+      <ProductCarousel
+        title="Top Selling Products"
+        products={formattedTopSelling}
+        viewAllLink="/shop?sort=popular"
+      />
 
-      {/* 6. Flash Sale (if active) */}
-      {activeFlashSale && <FlashSaleSection flashSale={activeFlashSale} />}
+      {/* 5. Section 3: Our Brands (Hidden if no brand has a logo - never hardcode fake logos) */}
+      <BrandRow brands={[]} />
 
-      {/* 7. Top Selling Products (2-column cards with 🔥 Best Selling badge) */}
-      <section className="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-8">
-        <h2 className="text-base sm:text-xl font-bold text-gray-900 text-center mb-4 sm:mb-6">
-          Top Selling Products
-        </h2>
+      {/* 6. Section 4 & 5: One product section per featured category + 1 Full-width Promo Banner after 2nd category */}
+      {categorySections.map((cat, idx) => (
+        <React.Fragment key={cat.id}>
+          <ProductCarousel
+            title={cat.name}
+            products={cat.products}
+            viewAllLink={`/category/${cat.slug}`}
+          />
 
-        {formattedFeaturedProducts.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center text-gray-500 text-xs">
-            No products available at the moment.
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-5">
-            {formattedFeaturedProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        )}
+          {/* Full-width Promo Banner placed after the 2nd category section */}
+          {idx === 1 && promoBanner && (
+            <div className="max-w-7xl mx-auto px-3 sm:px-6 py-4">
+              <PromoBanner banner={promoBanner} />
+            </div>
+          )}
+        </React.Fragment>
+      ))}
 
-        <div className="mt-8 text-center">
-          <Link
-            href="/shop"
-            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl border border-gray-200 hover:border-[#cc272d] text-xs font-bold text-gray-700 hover:text-[#cc272d] transition"
-          >
-            <span>View All Products</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
+      {/* If fewer than 2 categories existed, still show promo banner if available */}
+      {categorySections.length < 2 && promoBanner && (
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 py-4">
+          <PromoBanner banner={promoBanner} />
         </div>
-      </section>
+      )}
 
-      {/* 8. Promotional Banner (Mobile only, desktop has it beside hero slider) */}
-      <div className="lg:hidden">
-        <PromoBanner banner={promoBanner} />
-      </div>
+      {/* 7. Section 6: Just For You (10 products in 5x2 grid + red outlined LOAD MORE button) */}
+      <JustForYou initialProducts={formattedJustForYou} />
 
-      {/* 9. Trust & Assurance Bar */}
-      <div className="py-6 sm:py-10">
-        <TrustBar
-          items={
-            (defaultSettings as any).trustBarItems
-              ? JSON.parse((defaultSettings as any).trustBarItems)
-              : null
-          }
-        />
-      </div>
+      {/* 8. Section 7: Testimonials (Carousel of real review cards from DB) */}
+      <Testimonials reviews={formattedReviews} />
 
-      {/* 10. Footer */}
-      <Footer settings={defaultSettings as any} />
+      {/* 9. Footer: 5-Column Reference Footer */}
+      <Footer settings={defaultSettings as any} categories={formattedCategories} />
     </main>
   );
 }
