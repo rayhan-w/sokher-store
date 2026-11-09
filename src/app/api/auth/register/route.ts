@@ -7,7 +7,7 @@ export async function POST(request: Request) {
     const { name, email, phone, password } = await request.json();
 
     if (!name || !email || !password) {
-      return NextResponse.json({ error: 'নাম, ইমেইল এবং পাসওয়ার্ড আবশ্যক।' }, { status: 400 });
+      return NextResponse.json({ error: 'Name, email, and password are required.' }, { status: 400 });
     }
 
     const cleanEmail = email.toLowerCase().trim();
@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     });
 
     if (existing) {
-      return NextResponse.json({ error: 'এই ইমেইল দিয়ে আগেই অ্যাকাউন্ট খোলা হয়েছে।' }, { status: 400 });
+      return NextResponse.json({ error: 'An account with this email already exists.' }, { status: 400 });
     }
 
     const hashedPassword = await hashPassword(password);
@@ -60,6 +60,6 @@ export async function POST(request: Request) {
 
     return response;
   } catch (error: any) {
-    return NextResponse.json({ error: error.message || 'রেজিস্ট্রেশন ব্যর্থ হয়েছে।' }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Registration failed.' }, { status: 500 });
   }
 }

@@ -17,7 +17,7 @@ export default function AiShoppingAssistant() {
     {
       id: '1',
       sender: 'ai',
-      text: 'নমস্কার! আমি শখের স্টোরের AI বিউটি অ্যাসিস্ট্যান্ট। পণ্যের দাম, স্টক বা আপনার ত্বকের উপযোগী কোনো প্রসাধন খুঁজতে সাহায্য লাগলে আমাকে জানান!',
+      text: 'Hello! I am your Sokher Store AI Beauty Assistant. Ask me anything about product prices, availability, or skincare recommendations!',
     },
   ]);
 
@@ -52,7 +52,7 @@ export default function AiShoppingAssistant() {
       const aiMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         sender: 'ai',
-        text: data.reply || 'দুঃখিত, কোনো উত্তর পাওয়া যায়নি।',
+        text: data.reply || 'Sorry, no response could be generated.',
       };
       setMessages((prev) => [...prev, aiMsg]);
     } catch {
@@ -61,7 +61,7 @@ export default function AiShoppingAssistant() {
         {
           id: (Date.now() + 1).toString(),
           sender: 'ai',
-          text: 'সার্ভারের সাথে সংযোগ বিচ্ছিন্ন হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।',
+          text: 'Disconnected from server. Please try again.',
         },
       ]);
     } finally {
@@ -70,9 +70,9 @@ export default function AiShoppingAssistant() {
   };
 
   const quickPrompts = [
-    "Pond's cream এর দাম কত?",
-    "Maybelline foundation এর শেড কি কি আছে?",
-    "Sensitive skin এর জন্য কোন ফেসওয়াশ ভালো?",
+    "What is the price of Pond's cream?",
+    "Which face wash is good for sensitive skin?",
+    "Show best selling lipsticks",
   ];
 
   return (
@@ -142,7 +142,7 @@ export default function AiShoppingAssistant() {
                 <div className="w-6 h-6 rounded-full bg-rose-100 text-[#cc272d] flex items-center justify-center">
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
                 </div>
-                <span>শখের স্টোর ক্যাটালগ খোঁজা হচ্ছে...</span>
+                <span>Searching Sokher Store catalog...</span>
               </div>
             )}
             <div ref={messagesEndRef} />
@@ -173,7 +173,7 @@ export default function AiShoppingAssistant() {
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="পণ্য সম্পর্কে প্রশ্ন লিখুন..."
+              placeholder="Ask a question about products..."
               className="flex-1 py-2 px-3.5 text-xs bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:ring-1 focus:ring-[#cc272d]"
             />
             <button

@@ -126,20 +126,20 @@ export default function AdminSettingsPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setErrorMsg(data.error || 'সেটিংস সংরক্ষণ ব্যর্থ হয়েছে।');
+        setErrorMsg(data.error || 'Failed to save settings.');
       } else {
-        setToast('স্টোর সেটিংস সফলভাবে সংরক্ষিত হয়েছে!');
+        setToast('Store settings saved successfully!');
         setTimeout(() => setToast(null), 3500);
       }
     } catch {
-      setErrorMsg('সার্ভারে সমস্যা হয়েছে।');
+      setErrorMsg('Server connection error.');
     } finally {
       setSaving(false);
     }
   };
 
   if (loading) {
-    return <div className="p-8 text-xs text-gray-400">সেটিংস লোড হচ্ছে...</div>;
+    return <div className="p-8 text-xs text-gray-400">Loading settings...</div>;
   }
 
   return (
@@ -165,7 +165,7 @@ export default function AdminSettingsPage() {
           className="px-6 py-2.5 rounded-xl bg-[#cc272d] hover:bg-red-700 text-white font-bold text-xs sm:text-sm shadow-md transition flex items-center gap-2 disabled:opacity-40"
         >
           <Save className="w-4 h-4" />
-          <span>{saving ? 'সংরক্ষণ হচ্ছে...' : 'Save Settings'}</span>
+          <span>{saving ? 'Saving...' : 'Save Settings'}</span>
         </button>
       </div>
 
@@ -260,11 +260,11 @@ export default function AdminSettingsPage() {
       <div className="bg-white p-6 sm:p-8 rounded-3xl border border-gray-100 shadow-sm space-y-4">
         <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider border-b border-gray-100 pb-3 flex items-center gap-2">
           <Truck className="w-4 h-4 text-[#cc272d]" />
-          <span>Delivery Rates & Free Shipping (একক উৎস)</span>
+          <span>Delivery Rates & Free Shipping (Single Source of Truth)</span>
         </h2>
 
         <p className="text-xs text-gray-500">
-          এই চার্জগুলোই কার্ট, চেকআউট, প্রোডাক্ট পেজ ও ফুটারে প্রদর্শিত হবে।
+          These rates are strictly enforced across Cart, Checkout, Product pages, and Footer.
         </p>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
@@ -314,7 +314,7 @@ export default function AdminSettingsPage() {
       <div className="bg-white p-6 sm:p-8 rounded-3xl border border-gray-100 shadow-sm space-y-4">
         <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider border-b border-gray-100 pb-3 flex items-center gap-2">
           <CreditCard className="w-4 h-4 text-[#cc272d]" />
-          <span>Merchant Payment Numbers (বিকাশ ও নগদ নম্বর)</span>
+          <span>Merchant Payment Numbers (bKash & Nagad)</span>
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
@@ -350,13 +350,13 @@ export default function AdminSettingsPage() {
         </h2>
 
         <p className="text-xs text-gray-500">
-          Note: আইডি ফাঁকা থাকলে কোনো ট্র্যাকিং স্ক্রিপ্ট লোড হবে না। ভুল ফরম্যাট দিলে সেভ ব্লক হবে।
+          Note: If left blank, no tracking scripts will load. Invalid format will be rejected.
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
           <div>
             <label className="block font-semibold text-gray-700 mb-1">
-              Meta Pixel ID (শুধুমাত্র সংখ্যা)
+              Meta Pixel ID (Numeric digits only)
             </label>
             <input
               type="text"
@@ -382,7 +382,7 @@ export default function AdminSettingsPage() {
 
           <div>
             <label className="block font-semibold text-gray-700 mb-1">
-              GA4 Measurement ID (&ldquo;G-&rdquo; দিয়ে শুরু)
+              GA4 Measurement ID (Must start with &ldquo;G-&rdquo;)
             </label>
             <input
               type="text"
@@ -395,7 +395,7 @@ export default function AdminSettingsPage() {
 
           <div>
             <label className="block font-semibold text-gray-700 mb-1">
-              GTM Container ID (&ldquo;GTM-&rdquo; দিয়ে শুরু)
+              GTM Container ID (Must start with &ldquo;GTM-&rdquo;)
             </label>
             <input
               type="text"

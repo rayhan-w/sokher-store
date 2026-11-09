@@ -57,18 +57,18 @@ export default function AdminCategoriesPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setErrorMsg(data.error || 'ক্যাটাগরি তৈরি ব্যর্থ হয়েছে।');
+        setErrorMsg(data.error || 'Failed to create category.');
       } else {
         setName('');
         setSlug('');
         setImage('');
         setDescription('');
-        setToast('ক্যাটাগরি সফলভাবে তৈরি হয়েছে!');
+        setToast('Category created successfully!');
         setTimeout(() => setToast(null), 3000);
         fetchCategories();
       }
     } catch {
-      setErrorMsg('সার্ভারে সমস্যা হয়েছে।');
+      setErrorMsg('Server connection error.');
     } finally {
       setCreateLoading(false);
     }
@@ -100,15 +100,15 @@ export default function AdminCategoriesPage() {
       const res = await fetch(`/api/categories/${categoryToDelete.id}`, { method: 'DELETE' });
       const data = await res.json();
       if (res.ok) {
-        setToast(`"${categoryToDelete.name}" ক্যাটাগরি মুছে ফেলা হয়েছে (পণ্যগুলো সুরক্ষিত আছে)।`);
+        setToast(`"${categoryToDelete.name}" category deleted (products are safely preserved).`);
         setCategoryToDelete(null);
         fetchCategories();
         setTimeout(() => setToast(null), 3500);
       } else {
-        alert(data.error || 'ডিলিট করতে সমস্যা হয়েছে।');
+        alert(data.error || 'Failed to delete category.');
       }
     } catch {
-      alert('সার্ভারে সমস্যা হয়েছে।');
+      alert('Server error.');
     } finally {
       setDeleteLoading(false);
     }
@@ -195,7 +195,7 @@ export default function AdminCategoriesPage() {
               disabled={createLoading}
               className="w-full py-2.5 rounded-xl bg-[#cc272d] hover:bg-red-700 text-white font-bold transition disabled:opacity-40"
             >
-              {createLoading ? 'তৈরি হচ্ছে...' : 'Create Category'}
+              {createLoading ? 'Creating...' : 'Create Category'}
             </button>
           </form>
         </div>
@@ -208,9 +208,9 @@ export default function AdminCategoriesPage() {
 
           <div className="divide-y divide-gray-100">
             {loading ? (
-              <p className="text-xs text-gray-400 py-6 text-center">ক্যাটাগরি লোড হচ্ছে...</p>
+              <p className="text-xs text-gray-400 py-6 text-center">Loading categories...</p>
             ) : categories.length === 0 ? (
-              <p className="text-xs text-gray-400 py-6 text-center">কোনো ক্যাটাগরি তৈরি করা হয়নি।</p>
+              <p className="text-xs text-gray-400 py-6 text-center">No categories created yet.</p>
             ) : (
               categories.map((c) => (
                 <div key={c.id} className="py-4 space-y-2">
@@ -297,10 +297,9 @@ export default function AdminCategoriesPage() {
       {categoryToDelete && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="w-full max-w-md bg-white rounded-3xl p-6 sm:p-8 shadow-2xl space-y-4 animate-in fade-in">
-            <h3 className="text-base font-bold text-gray-900">ক্যাটাগরি মুছে ফেলতে চান?</h3>
+            <h3 className="text-base font-bold text-gray-900">Delete this Category?</h3>
             <p className="text-xs text-gray-500 leading-relaxed">
-              &ldquo;{categoryToDelete.name}&rdquo; ক্যাটাগরি ডিলিট করলেও পণ্যগুলো মুছে যাবে না। সেগুলোকে
-              স্বয়ংক্রিয়ভাবে &ldquo;Uncategorized&rdquo; ক্যাটাগরিতে নিরাপদে রেখে দেওয়া হবে।
+              Deleting &ldquo;{categoryToDelete.name}&rdquo; will not delete associated products. They will be safely reassigned to the &ldquo;Uncategorized&rdquo; category.
             </p>
             <div className="flex gap-3 pt-2">
               <button
@@ -314,7 +313,7 @@ export default function AdminCategoriesPage() {
                 disabled={deleteLoading}
                 className="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold"
               >
-                {deleteLoading ? 'ডিলিট হচ্ছে...' : 'Confirm Delete'}
+                {deleteLoading ? 'Deleting...' : 'Confirm Delete'}
               </button>
             </div>
           </div>

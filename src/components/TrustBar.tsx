@@ -17,28 +17,28 @@ export default function TrustBar({ items }: TrustBarProps) {
   const defaultItems: TrustBarItem[] = [
     {
       icon: 'Truck',
-      title: 'সারা দেশে ডেলিভারি',
-      subtitle: 'দ্রুত ও নিরাপদ হোম ডেলিভারি',
+      title: 'Nationwide Delivery',
+      subtitle: 'Fast & secure home delivery',
     },
     {
       icon: 'ShieldCheck',
-      title: '১০০% অরিজিনাল পণ্য',
-      subtitle: 'সরাসরি অথেন্টিক সোর্স থেকে',
+      title: '100% Genuine Products',
+      subtitle: 'Directly from authentic sources',
     },
     {
       icon: 'Banknote',
-      title: 'ক্যাশ অন ডেলিভারি',
-      subtitle: 'পণ্য দেখে টাকা পরিশোধের সুবিধা',
+      title: 'Cash on Delivery',
+      subtitle: 'Pay after inspecting your parcel',
     },
     {
       icon: 'RotateCcw',
-      title: 'সহজ রিটার্ন পলিসি',
-      subtitle: 'পণ্য পছন্দ না হলে সহজ সমাধান',
+      title: 'Easy Return Policy',
+      subtitle: 'Hassle-free 7-day resolution',
     },
     {
       icon: 'Headphones',
-      title: '২৪/৭ সাপোর্ট',
-      subtitle: 'যেকোনো প্রয়োজনে পাশে আছি',
+      title: '24/7 Support',
+      subtitle: 'We are always here to help',
     },
   ];
 

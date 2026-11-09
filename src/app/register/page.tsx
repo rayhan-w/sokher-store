@@ -22,7 +22,7 @@ export default function RegisterPage() {
     setErrorMsg('');
 
     if (password.length < 6) {
-      setErrorMsg('পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।');
+      setErrorMsg('Password must be at least 6 characters long.');
       return;
     }
 
@@ -38,7 +38,7 @@ export default function RegisterPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setErrorMsg(data.error || 'রেজিস্ট্রেশন ব্যর্থ হয়েছে।');
+        setErrorMsg(data.error || 'Registration failed.');
         setLoading(false);
         return;
       }
@@ -46,7 +46,7 @@ export default function RegisterPage() {
       login(data.user);
       router.push('/account');
     } catch {
-      setErrorMsg('সার্ভারে সমস্যা দেখা দিয়েছে।');
+      setErrorMsg('Server error. Please try again.');
       setLoading(false);
     }
   };
@@ -64,7 +64,7 @@ export default function RegisterPage() {
             </span>
           </Link>
           <h2 className="text-xl font-bold text-gray-900">Create an Account</h2>
-          <p className="text-xs text-gray-500">শখের স্টোরে নতুন অ্যাকাউন্ট তৈরি করুন</p>
+          <p className="text-xs text-gray-500">Create a new account at Sokher Store</p>
         </div>
 
         {errorMsg && (
@@ -139,13 +139,13 @@ export default function RegisterPage() {
             disabled={loading}
             className="w-full py-3 px-4 rounded-xl bg-[#cc272d] hover:bg-red-700 text-white font-bold text-sm shadow-md transition flex items-center justify-center gap-2 disabled:opacity-40"
           >
-            <span>{loading ? 'অ্যাকাউন্ট তৈরি হচ্ছে...' : 'Create Account'}</span>
+            <span>{loading ? 'Creating Account...' : 'Create Account'}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </form>
 
         <div className="text-center text-xs text-gray-500 pt-2 border-t border-gray-100">
-          ইতিমধ্যে অ্যাকাউন্ট আছে?{' '}
+          Already have an account?{' '}
           <Link href="/login" className="font-bold text-[#cc272d] hover:underline">
             Login
           </Link>

@@ -56,14 +56,14 @@ export default function HeroSlider({ slides = [] }: HeroSliderProps) {
         <Link href={slide.buttonUrl || '/shop'} className="block w-full h-full relative">
           <Image
             src={slide.imageUrl}
-            alt="Sokher Store Promotion"
+            alt={slide.title || 'Sokher Store Promotion'}
             fill
             priority
             className="object-cover object-center"
           />
         </Link>
 
-        {/* Bottom-Left Dots Indicator (Exact match to screenshot) */}
+        {/* Bottom-Left Dots Indicator */}
         {displaySlides.length > 1 && (
           <div className="absolute bottom-3 left-4 flex items-center gap-1.5 z-20">
             {displaySlides.map((_, i) => (

@@ -36,10 +36,10 @@ export default async function OrderSuccessPage({ params }: { params: { orderNumb
               Order Confirmed
             </span>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-950 mt-1">
-              ধন্যবাদ! আপনার অর্ডারটি গৃহীত হয়েছে।
+              Thank You! Your order has been placed.
             </h1>
             <p className="text-xs sm:text-sm text-gray-500 mt-2">
-              আপনার অর্ডার নম্বর: <strong className="text-gray-900 font-bold">{order.orderNumber}</strong>
+              Your Order Number: <strong className="text-gray-900 font-bold">{order.orderNumber}</strong>
             </p>
           </div>
 

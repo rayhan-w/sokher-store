@@ -19,7 +19,7 @@ export async function getShoppingAssistantReply(userMessage: string): Promise<st
   const catalogContext = products
     .map(
       (p) =>
-        `- ${p.name} (দাম: ৳${p.price}, স্টক: ${p.stock > 0 ? `${p.stock} টি আছে` : 'স্টক শেষ'}${p.badge ? `, ব্যাজ: ${p.badge}` : ''})`
+        `- ${p.name} (Price: ৳${p.price}, Stock: ${p.stock > 0 ? `${p.stock} available` : 'Out of stock'}${p.badge ? `, Badge: ${p.badge}` : ''})`
     )
     .join('\n');
 
@@ -35,8 +35,8 @@ export async function getShoppingAssistantReply(userMessage: string): Promise<st
               {
                 parts: [
                   {
-                    text: `You are the friendly AI Beauty & Shopping Assistant for "Sokher Store" (a top Bangladeshi cosmetics & skincare e-commerce).
-Respond helpfully in warm, polite Bengali (with English cosmetic terms where natural).
+                    text: `You are the friendly AI Beauty & Shopping Assistant for "Sokher Store" (a top cosmetics & skincare e-commerce store).
+Respond helpfully in warm, polite English (mentioning BDT prices with the ৳ symbol).
 Use ONLY this actual catalog data to answer price, stock, and product questions:
 
 ${catalogContext}
@@ -66,11 +66,11 @@ Guide them to relevant products, mention current prices in ৳ (Taka), and sugge
   });
 
   if (matching.length > 0) {
-    const list = matching.map((p) => `• ${p.name} - ৳${p.price} (${p.stock > 0 ? 'স্টকে আছে' : 'স্টক আউট'})`).join('\n');
-    return `শখের স্টোরে আপনার পছন্দের পণ্যগুলো দেখুন:\n\n${list}\n\nপণ্যটি কার্টে যোগ করে সহজেই অর্ডার করতে পারেন! আর কোনো তথ্য জানার থাকলে আমাকে জিজ্ঞেস করতে পারেন।`;
+    const list = matching.map((p) => `• ${p.name} - ৳${p.price} (${p.stock > 0 ? 'In Stock' : 'Out of Stock'})`).join('\n');
+    return `Here are the matching products at Sokher Store:\n\n${list}\n\nYou can easily add any item to your cart and place an order! Feel free to ask if you have more questions.`;
   }
 
-  return `নমস্কার! শখের স্টোরে আপনাকে স্বাগতম। আমাদের স্কিনকেয়ার, মেকআপ, হেয়ার কেয়ার ও বডি কেয়ারের অরিজিনাল পণ্যগুলো দেখতে আমাদের শপ পেইজ ঘুরে দেখতে পারেন। আপনি কি কোনো নির্দিষ্ট পণ্য খুঁজছেন?`;
+  return `Hello! Welcome to Sokher Store. Feel free to explore our shop page for authentic skincare, makeup, haircare, and body care products. Are you looking for a specific product?`;
 }
 
 /**

@@ -30,13 +30,13 @@ export default function AdminLoginPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setErrorMsg(data.error || 'ভুল ইমেইল বা পাসওয়ার্ড।');
+        setErrorMsg(data.error || 'Invalid email or password.');
         setLoading(false);
         return;
       }
 
       if (data.user.role !== 'ADMIN') {
-        setErrorMsg('অননুমোদিত এক্সেস! শুধুমাত্র অ্যাডমিন লগইন করতে পারবেন।');
+        setErrorMsg('Unauthorized access! Admin privileges required.');
         setLoading(false);
         return;
       }
@@ -44,7 +44,7 @@ export default function AdminLoginPage() {
       login(data.user);
       router.push('/admin');
     } catch {
-      setErrorMsg('সার্ভারে সমস্যা হয়েছে।');
+      setErrorMsg('Server connection error.');
       setLoading(false);
     }
   };
@@ -57,7 +57,7 @@ export default function AdminLoginPage() {
             <ShieldCheck className="w-7 h-7" />
           </div>
           <h1 className="text-2xl font-black tracking-tight text-white">Sokher Store Admin</h1>
-          <p className="text-xs text-gray-400">মাস্টার অ্যাডমিন কন্ট্রোল প্যানেল</p>
+          <p className="text-xs text-gray-400">Master Admin Control Panel</p>
         </div>
 
         {errorMsg && (
@@ -107,7 +107,7 @@ export default function AdminLoginPage() {
             disabled={loading}
             className="w-full py-3 px-4 rounded-xl bg-[#cc272d] hover:bg-red-700 text-white font-bold text-sm shadow-md shadow-red-600/30 transition flex items-center justify-center gap-2 disabled:opacity-40"
           >
-            <span>{loading ? 'যাচাই করা হচ্ছে...' : 'Enter Admin Panel'}</span>
+            <span>{loading ? 'Verifying...' : 'Enter Admin Panel'}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </form>

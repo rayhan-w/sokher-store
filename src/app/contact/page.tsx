@@ -19,7 +19,7 @@ export default function ContactPage() {
             Contact Sokher Store
           </h1>
           <p className="text-sm text-gray-500 max-w-xl mx-auto">
-            যেকোনো তথ্য, অর্ডার সংক্রান্ত জিজ্ঞাসা বা পাইকারি কেনাকাটার জন্য আমাদের সাথে যোগাযোগ করুন।
+            Get in touch with us for product inquiries, order updates, or wholesale assistance.
           </p>
         </div>
 
@@ -28,7 +28,7 @@ export default function ContactPage() {
             <div className="w-12 h-12 rounded-2xl bg-rose-50 text-[#cc272d] flex items-center justify-center mx-auto">
               <Phone className="w-6 h-6" />
             </div>
-            <h3 className="text-sm font-bold text-gray-900">হটলাইন ও ফোন</h3>
+            <h3 className="text-sm font-bold text-gray-900">Phone & Helpline</h3>
             <p className="text-xs text-gray-500 font-mono">+880 1700-000000</p>
           </div>
 
@@ -36,7 +36,7 @@ export default function ContactPage() {
             <div className="w-12 h-12 rounded-2xl bg-rose-50 text-[#cc272d] flex items-center justify-center mx-auto">
               <Mail className="w-6 h-6" />
             </div>
-            <h3 className="text-sm font-bold text-gray-900">ইমেইল সাপোর্ট</h3>
+            <h3 className="text-sm font-bold text-gray-900">Email Support</h3>
             <p className="text-xs text-gray-500 font-mono">support@sokherstore.com</p>
           </div>
 
@@ -44,8 +44,8 @@ export default function ContactPage() {
             <div className="w-12 h-12 rounded-2xl bg-rose-50 text-[#cc272d] flex items-center justify-center mx-auto">
               <MapPin className="w-6 h-6" />
             </div>
-            <h3 className="text-sm font-bold text-gray-900">অফিস ও আউটলেট</h3>
-            <p className="text-xs text-gray-500">মিরপুর, ঢাকা - ১২১৬, বাংলাদেশ</p>
+            <h3 className="text-sm font-bold text-gray-900">Head Office</h3>
+            <p className="text-xs text-gray-500">Mirpur, Dhaka - 1216, Bangladesh</p>
           </div>
         </div>
       </main>

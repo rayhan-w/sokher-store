@@ -66,7 +66,7 @@ export default async function HomePage() {
     storeName: 'Sokher Store',
     tagline: 'Your Beauty, Our Passion',
     logoUrl: '/images/logo-icon.jpg',
-    announcementText: 'সারা দেশে দ্রুত ক্যাশ অন ডেলিভারি | ৳৯৯৯ বা তার বেশি অর্ডারে ফ্রি ডেলিভারি!',
+    announcementText: 'Fast Cash on Delivery all over Bangladesh | Free Shipping on orders over ৳999!',
     isAnnouncementActive: true,
     freeDeliveryThreshold: 999,
     contactPhone: '+880 1700-000000',
@@ -115,22 +115,22 @@ export default async function HomePage() {
       {/* 1. Announcement Bar (Hidden on Mobile to match screenshot) */}
       <AnnouncementBar settings={defaultSettings as any} />
 
-      {/* 2. Header (Exact mobile match: [☰]  [SOKHER STORE]  [🛒 0]) */}
+      {/* 2. Header (Clean mobile view: [☰]  [SOKHER STORE]  [🛒 0]) */}
       <Header settings={defaultSettings as any} categories={formattedCategories} />
 
-      {/* 3. Hero Banner Slider (Exact mobile match: aspect-[16/9] with bottom-left dots) */}
+      {/* 3. Hero Banner Slider (16:9 on mobile with pagination dots) */}
       <HeroSlider slides={heroSlides} />
 
-      {/* 4. Featured Categories (Exact match: centered title, squircle rounded-3xl cards with arrow) */}
+      {/* 4. Featured Categories (Squircle cards with arrow) */}
       <CategoryCircles categories={formattedCategories} />
 
-      {/* 5. Floating Side Cart Tab (Exact match: right edge pill with Items count & Price) */}
+      {/* 5. Floating Side Cart Tab (Right edge pill) */}
       <FloatingCartTab />
 
       {/* 6. Flash Sale (if active) */}
       {activeFlashSale && <FlashSaleSection flashSale={activeFlashSale} />}
 
-      {/* 7. Top Selling Products (Exact match: centered title, 2-column cards with 🔥 Best Selling badge) */}
+      {/* 7. Top Selling Products (2-column cards with 🔥 Best Selling badge) */}
       <section className="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-8">
         <h2 className="text-base sm:text-xl font-bold text-gray-900 text-center mb-4 sm:mb-6">
           Top Selling Products
@@ -138,7 +138,7 @@ export default async function HomePage() {
 
         {formattedFeaturedProducts.length === 0 ? (
           <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center text-gray-500 text-xs">
-            বর্তমানে কোনো পণ্য নেই।
+            No products available at the moment.
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-5">
@@ -162,7 +162,7 @@ export default async function HomePage() {
       {/* 8. Promotional Banner */}
       <PromoBanner banner={promoBanner} />
 
-      {/* 9. Trust & Assurance Bar (Placed near bottom) */}
+      {/* 9. Trust & Assurance Bar */}
       <div className="py-6 sm:py-10">
         <TrustBar
           items={

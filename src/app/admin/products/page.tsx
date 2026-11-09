@@ -58,15 +58,15 @@ export default function AdminProductsPage() {
       const data = await res.json();
 
       if (res.ok) {
-        setToastMessage(`"${productToDelete.name}" সফলভাবে মুছে ফেলা হয়েছে।`);
+        setToastMessage(`"${productToDelete.name}" deleted successfully.`);
         setProductToDelete(null);
         fetchProducts(); // Refresh list immediately
         setTimeout(() => setToastMessage(null), 4000);
       } else {
-        alert(data.error || 'ডিলিট করতে সমস্যা হয়েছে।');
+        alert(data.error || 'Failed to delete product.');
       }
     } catch {
-      alert('সার্ভারে সমস্যা হয়েছে।');
+      alert('Server error.');
     } finally {
       setDeleteLoading(false);
     }
@@ -149,13 +149,13 @@ export default function AdminProductsPage() {
               {loading ? (
                 <tr>
                   <td colSpan={7} className="text-center py-12 text-gray-400">
-                    পণ্য তালিকা লোড হচ্ছে...
+                    Loading products...
                   </td>
                 </tr>
               ) : products.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="text-center py-12 text-gray-400">
-                    কোনো পণ্য পাওয়া যায়নি।
+                    No products found.
                   </td>
                 </tr>
               ) : (
@@ -264,10 +264,10 @@ export default function AdminProductsPage() {
 
             <div className="text-center space-y-1">
               <h3 className="text-base sm:text-lg font-bold text-gray-900">
-                পণ্যটি মুছে ফেলতে নিশ্চিত?
+                Are you sure you want to delete this product?
               </h3>
               <p className="text-xs text-gray-500">
-                &ldquo;{productToDelete.name}&rdquo; (SKU: {productToDelete.sku}) স্থায়ীভাবে ডেটাবেস থেকে মুছে ফেলা হবে।
+                &ldquo;{productToDelete.name}&rdquo; (SKU: {productToDelete.sku}) will be permanently removed from the database.
               </p>
             </div>
 
@@ -277,7 +277,7 @@ export default function AdminProductsPage() {
                 onClick={() => setProductToDelete(null)}
                 className="flex-1 py-2.5 rounded-xl border border-gray-200 hover:bg-gray-50 text-xs font-semibold text-gray-700 transition"
               >
-                বাতিল করুন (Cancel)
+                Cancel
               </button>
 
               <button
@@ -286,7 +286,7 @@ export default function AdminProductsPage() {
                 disabled={deleteLoading}
                 className="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition shadow-md disabled:opacity-40"
               >
-                {deleteLoading ? 'ডিলিট হচ্ছে...' : 'হ্যাঁ, মুছে ফেলুন'}
+                {deleteLoading ? 'Deleting...' : 'Yes, Delete'}
               </button>
             </div>
           </div>

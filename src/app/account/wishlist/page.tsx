@@ -24,7 +24,7 @@ export default function WishlistPage() {
               <Heart className="w-7 h-7 text-[#cc272d] fill-[#cc272d]" />
               <span>My Wishlist ({items.length})</span>
             </h1>
-            <p className="text-xs text-gray-500 mt-1">আপনার পছন্দের সংরক্ষিত পণ্য তালিকা</p>
+            <p className="text-xs text-gray-500 mt-1">Your saved favorite beauty products</p>
           </div>
           <Link
             href="/shop"
@@ -40,9 +40,9 @@ export default function WishlistPage() {
             <div className="w-16 h-16 rounded-full bg-rose-50 text-[#cc272d] flex items-center justify-center mx-auto">
               <Heart className="w-8 h-8" />
             </div>
-            <h2 className="text-xl font-bold text-gray-900">আপনার উইশলিস্টে কোনো পণ্য নেই</h2>
+            <h2 className="text-xl font-bold text-gray-900">Your wishlist is empty</h2>
             <p className="text-xs sm:text-sm text-gray-500 max-w-sm mx-auto">
-              পছন্দের পণ্যের ওপর হার্ট আইকনে ক্লিক করে উইশলিস্টে সংরক্ষণ করুন।
+              Click the heart icon on any product to save it to your wishlist.
             </p>
             <Link
               href="/shop"

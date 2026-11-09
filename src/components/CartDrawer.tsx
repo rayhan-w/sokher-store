@@ -35,13 +35,13 @@ export default function CartDrawer() {
             <div className="flex items-center gap-2">
               <ShoppingBag className="w-5 h-5 text-[#cc272d]" />
               <h2 className="text-base sm:text-lg font-black text-gray-900">
-                আপনার শপিং কার্ট ({items.length})
+                Shopping Cart ({items.length})
               </h2>
             </div>
             <button
               onClick={() => setIsCartDrawerOpen(false)}
               className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition"
-              aria-label="কার্ট বন্ধ করুন"
+              aria-label="Close Cart"
             >
               <X className="w-5 h-5" />
             </button>
@@ -54,16 +54,16 @@ export default function CartDrawer() {
                 <div className="w-16 h-16 rounded-full bg-rose-50 flex items-center justify-center text-[#cc272d]">
                   <ShoppingBag className="w-8 h-8" />
                 </div>
-                <h3 className="text-base font-bold text-gray-900">আপনার কার্টটি ফাঁকা রয়েছে</h3>
+                <h3 className="text-base font-bold text-gray-900">Your cart is currently empty</h3>
                 <p className="text-xs sm:text-sm text-gray-500 max-w-xs">
-                  পছন্দের রূপচর্চার পণ্যগুলো কার্টে যোগ করুন এবং আকর্ষণীয় ছাড় উপভোগ করুন।
+                  Discover our premium beauty collection and add items to your cart.
                 </p>
                 <Link
                   href="/shop"
                   onClick={() => setIsCartDrawerOpen(false)}
                   className="px-6 py-2.5 rounded-xl bg-[#cc272d] text-white text-xs sm:text-sm font-bold hover:bg-red-700 transition shadow-md"
                 >
-                  শপিং শুরু করুন
+                  Start Shopping
                 </Link>
               </div>
             ) : (
@@ -96,8 +96,8 @@ export default function CartDrawer() {
                           <button
                             onClick={() => removeFromCart(item.productId, item.variant)}
                             className="text-gray-400 hover:text-red-600 transition"
-                            aria-label="মুছে ফেলুন"
-                            title="মুছে ফেলুন"
+                            aria-label="Remove item"
+                            title="Remove"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -122,7 +122,7 @@ export default function CartDrawer() {
                               updateQuantity(item.productId, item.variant, item.quantity - 1)
                             }
                             className="p-1 hover:bg-gray-100 text-gray-600 transition"
-                            aria-label="কমান"
+                            aria-label="Decrease quantity"
                           >
                             <Minus className="w-3 h-3" />
                           </button>
@@ -135,14 +135,14 @@ export default function CartDrawer() {
                             }
                             disabled={item.quantity >= item.stock}
                             className="p-1 hover:bg-gray-100 text-gray-600 transition disabled:opacity-40"
-                            aria-label="বাড়ান"
+                            aria-label="Increase quantity"
                           >
                             <Plus className="w-3 h-3" />
                           </button>
                         </div>
 
                         <span className="text-[11px] text-gray-500 font-semibold">
-                          মোট: {formatPrice(item.price * item.quantity)}
+                          Total: {formatPrice(item.price * item.quantity)}
                         </span>
                       </div>
                     </div>
@@ -152,11 +152,11 @@ export default function CartDrawer() {
             )}
           </div>
 
-          {/* Footer & Actions (Ghorer Bazar Style) */}
+          {/* Footer & Actions */}
           {items.length > 0 && (
             <div className="p-4 sm:p-5 border-t border-gray-200 bg-gray-50 space-y-3">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-gray-600 font-bold">সাবটোটাল:</span>
+                <span className="text-gray-600 font-bold">Subtotal:</span>
                 <span className="text-base font-black text-gray-900">
                   {formatPrice(subtotal)}
                 </span>
@@ -167,7 +167,7 @@ export default function CartDrawer() {
                   onClick={clearCart}
                   className="py-2.5 px-3 rounded-lg border border-red-200 text-[#cc272d] hover:bg-red-50 text-xs font-bold transition"
                 >
-                  খালি করুন
+                  Clear
                 </button>
 
                 <Link
@@ -175,7 +175,7 @@ export default function CartDrawer() {
                   onClick={() => setIsCartDrawerOpen(false)}
                   className="py-2.5 px-3 rounded-lg border border-gray-300 hover:bg-gray-100 text-gray-700 text-xs font-bold transition"
                 >
-                  কার্ট পেজ
+                  View Cart
                 </Link>
 
                 <Link
@@ -183,7 +183,7 @@ export default function CartDrawer() {
                   onClick={() => setIsCartDrawerOpen(false)}
                   className="flex-1 py-2.5 px-4 rounded-xl bg-[#cc272d] hover:bg-red-700 text-white text-xs sm:text-sm font-black flex items-center justify-center gap-1.5 shadow-md shadow-red-600/25 transition active:scale-95"
                 >
-                  <span>অর্ডার সম্পন্ন করুন</span>
+                  <span>Checkout</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>

@@ -66,7 +66,7 @@ export default function AdminFlashSalesPage() {
       });
 
       if (res.ok) {
-        setToast('ফ্ল্যাশ সেল সফলভাবে সক্রিয় করা হয়েছে!');
+        setToast('Flash sale activated successfully!');
         setTimeout(() => setToast(null), 3500);
         const ref = await fetch('/api/flash-sales');
         const refData = await ref.json();
@@ -180,7 +180,7 @@ export default function AdminFlashSalesPage() {
               disabled={loading}
               className="w-full py-2.5 bg-[#cc272d] hover:bg-red-700 text-white font-bold rounded-xl transition shadow-md"
             >
-              {loading ? 'লঞ্চ হচ্ছে...' : 'Launch Flash Sale'}
+              {loading ? 'Launching...' : 'Launch Flash Sale'}
             </button>
           </form>
         </div>
@@ -197,7 +197,7 @@ export default function AdminFlashSalesPage() {
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#cc272d] text-white">LIVE</span>
                 <h3 className="text-base font-bold text-gray-900 mt-1">{activeSale.title}</h3>
                 <p className="text-gray-500">
-                  Ends: {new Date(activeSale.endTime).toLocaleString('bn-BD')}
+                  Ends: {new Date(activeSale.endTime).toLocaleString('en-US')}
                 </p>
               </div>
 
@@ -212,7 +212,7 @@ export default function AdminFlashSalesPage() {
               </div>
             </div>
           ) : (
-            <p className="text-xs text-gray-400 py-6 text-center">বর্তমানে কোনো লাইভ ফ্ল্যাশ সেল চলছে না।</p>
+            <p className="text-xs text-gray-400 py-6 text-center">No active flash sale currently running.</p>
           )}
         </div>
       </div>

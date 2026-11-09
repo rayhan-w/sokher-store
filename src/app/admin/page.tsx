@@ -83,7 +83,7 @@ export default function AdminDashboardPage() {
       const data = await res.json();
       setAiInsight(data.insight);
     } catch {
-      setAiInsight('AI ইনসাইট লোড করতে সমস্যা হয়েছে।');
+      setAiInsight('Unable to load AI insights.');
     } finally {
       setLoadingAi(false);
     }
@@ -92,7 +92,7 @@ export default function AdminDashboardPage() {
   if (loading || !stats) {
     return (
       <div className="p-8 text-center text-xs text-gray-500">
-        ড্যাশবোর্ড ডেটা লোড হচ্ছে...
+        Loading dashboard data...
       </div>
     );
   }
@@ -114,7 +114,7 @@ export default function AdminDashboardPage() {
           className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-[#cc272d] text-white text-xs font-bold shadow-md shadow-red-600/20 hover:scale-102 transition"
         >
           <Sparkles className="w-4 h-4 animate-pulse" />
-          <span>{loadingAi ? 'AI বিশ্লেষণ হচ্ছে...' : 'AI Sales Insight'}</span>
+          <span>{loadingAi ? 'Analyzing sales...' : 'AI Sales Insight'}</span>
         </button>
       </div>
 
@@ -211,7 +211,7 @@ export default function AdminDashboardPage() {
 
           <div className="divide-y divide-gray-100">
             {stats.recentOrders.length === 0 ? (
-              <p className="text-xs text-gray-400 py-6 text-center">এখনো কোনো অর্ডার আসেনি।</p>
+              <p className="text-xs text-gray-400 py-6 text-center">No orders received yet.</p>
             ) : (
               stats.recentOrders.map((o) => (
                 <div key={o.id} className="py-3 flex items-center justify-between text-xs gap-3">

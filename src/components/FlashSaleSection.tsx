@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Flame, Timer, ArrowRight, Sparkles } from 'lucide-react';
+import { Flame, Timer, ArrowRight } from 'lucide-react';
 import ProductCard from './ProductCard';
 
 interface FlashSaleSectionProps {
@@ -61,7 +61,7 @@ export default function FlashSaleSection({ flashSale }: FlashSaleSectionProps) {
   }
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <section className="max-w-7xl mx-auto px-3 sm:px-6 py-6 sm:py-10">
       <div className="bg-gradient-to-r from-red-600 via-[#cc272d] to-red-700 rounded-3xl p-5 sm:p-8 text-white shadow-xl shadow-red-600/20">
         {/* Flash Sale Header Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/20">
@@ -72,9 +72,9 @@ export default function FlashSaleSection({ flashSale }: FlashSaleSectionProps) {
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-[11px] font-black uppercase tracking-wider bg-yellow-300 text-gray-950 px-2 py-0.5 rounded-full">
-                  হট অফার
+                  HOT DEALS
                 </span>
-                <span className="text-xs text-rose-100 font-semibold">সীমিত সময়ের ডিল</span>
+                <span className="text-xs text-rose-100 font-semibold">Limited Time Offer</span>
               </div>
               <h2 className="text-xl sm:text-2xl font-black tracking-tight mt-0.5">
                 {flashSale.title}
@@ -82,34 +82,34 @@ export default function FlashSaleSection({ flashSale }: FlashSaleSectionProps) {
             </div>
           </div>
 
-          {/* Countdown Timer Boxes (Ghorer Bazar Style) */}
+          {/* Countdown Timer Boxes */}
           <div className="flex items-center gap-2.5">
             <span className="text-xs font-bold text-rose-100 flex items-center gap-1.5">
-              <Timer className="w-4 h-4 text-yellow-300" /> অফার শেষ হতে বাকি:
+              <Timer className="w-4 h-4 text-yellow-300" /> Ends In:
             </span>
             <div className="flex items-center gap-1.5 font-mono font-black text-xs sm:text-sm">
               {timeLeft.days > 0 && (
                 <>
                   <div className="bg-black/40 backdrop-blur-md px-2.5 py-1.5 rounded-lg border border-white/10 text-center">
                     <div>{String(timeLeft.days).padStart(2, '0')}</div>
-                    <div className="text-[9px] text-gray-300 font-sans font-normal">দিন</div>
+                    <div className="text-[9px] text-gray-300 font-sans font-normal">Days</div>
                   </div>
                   <span>:</span>
                 </>
               )}
               <div className="bg-black/40 backdrop-blur-md px-2.5 py-1.5 rounded-lg border border-white/10 text-center min-w-[2.5rem]">
                 <div>{String(timeLeft.hours).padStart(2, '0')}</div>
-                <div className="text-[9px] text-gray-300 font-sans font-normal">ঘণ্টা</div>
+                <div className="text-[9px] text-gray-300 font-sans font-normal">Hours</div>
               </div>
               <span>:</span>
               <div className="bg-black/40 backdrop-blur-md px-2.5 py-1.5 rounded-lg border border-white/10 text-center min-w-[2.5rem]">
                 <div>{String(timeLeft.minutes).padStart(2, '0')}</div>
-                <div className="text-[9px] text-gray-300 font-sans font-normal">মিনিট</div>
+                <div className="text-[9px] text-gray-300 font-sans font-normal">Mins</div>
               </div>
               <span>:</span>
               <div className="bg-black/40 backdrop-blur-md px-2.5 py-1.5 rounded-lg border border-white/10 text-center min-w-[2.5rem] text-yellow-300">
                 <div>{String(timeLeft.seconds).padStart(2, '0')}</div>
-                <div className="text-[9px] text-yellow-200 font-sans font-normal">সেকেন্ড</div>
+                <div className="text-[9px] text-yellow-200 font-sans font-normal">Secs</div>
               </div>
             </div>
           </div>
@@ -127,7 +127,7 @@ export default function FlashSaleSection({ flashSale }: FlashSaleSectionProps) {
               price: item.salePrice,
               regularPrice: p.price,
               stock: p.stock,
-              badge: 'হট ডিল',
+              badge: 'Flash Deal',
               images: JSON.parse(p.images || '[]'),
               rating: 5,
               reviewCount: 350,
@@ -147,7 +147,7 @@ export default function FlashSaleSection({ flashSale }: FlashSaleSectionProps) {
             href="/shop"
             className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-white text-[#cc272d] font-bold text-xs sm:text-sm hover:bg-rose-50 transition shadow-lg"
           >
-            <span>সব অফার পণ্য দেখুন</span>
+            <span>View All Flash Deals</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

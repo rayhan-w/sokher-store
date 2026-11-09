@@ -6,7 +6,7 @@ export async function POST(request: Request) {
     const { code, subtotal } = await request.json();
 
     if (!code) {
-      return NextResponse.json({ error: 'কুপন কোড প্রদান করুন।' }, { status: 400 });
+      return NextResponse.json({ error: 'Please provide a coupon code.' }, { status: 400 });
     }
 
     const cleanCode = code.trim().toUpperCase();
@@ -15,23 +15,23 @@ export async function POST(request: Request) {
     });
 
     if (!coupon || !coupon.isActive) {
-      return NextResponse.json({ error: 'ভুল বা নিষ্ক্রিয় কুপন কোড (Invalid coupon).' }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid or inactive coupon code.' }, { status: 400 });
     }
 
     if (coupon.expiryDate && new Date(coupon.expiryDate) < new Date()) {
-      return NextResponse.json({ error: 'কুপনটির মেয়াদ শেষ হয়ে গেছে (Coupon expired).' }, { status: 400 });
+      return NextResponse.json({ error: 'This coupon has expired.' }, { status: 400 });
     }
 
     const currentSubtotal = parseFloat(subtotal) || 0;
     if (coupon.minOrderAmount && currentSubtotal < coupon.minOrderAmount) {
       return NextResponse.json(
-        { error: `এই কুপনটি ব্যবহার করতে ন্যূনতম ৳${coupon.minOrderAmount} টাকার পণ্য অর্ডার করতে হবে।` },
+        { error: `Minimum order amount of ৳${coupon.minOrderAmount} required for this coupon.` },
         { status: 400 }
       );
     }
 
     if (coupon.usageLimit && coupon.usageCount >= coupon.usageLimit) {
-      return NextResponse.json({ error: 'কুপনটির ব্যবহারের সর্বোচ্চ সীমা শেষ।' }, { status: 400 });
+      return NextResponse.json({ error: 'This coupon has reached its maximum usage limit.' }, { status: 400 });
     }
 
     let discount = 0;
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
       valid: true,
       couponCode: coupon.code,
       discountAmount: Math.round(discount),
-      message: `কুপন কোড সফলভাবে যোগ করা হয়েছে! আপনি ৳${Math.round(discount)} ছাড় পেয়েছেন।`,
+      message: `Coupon code applied! You saved ৳${Math.round(discount)}.`,
     });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

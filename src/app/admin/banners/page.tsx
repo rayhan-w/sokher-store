@@ -44,7 +44,7 @@ export default function AdminBannersPage() {
         setTitle('');
         setSubtitle('');
         setImageUrl('');
-        setToast('ব্যানার সফলভাবে যোগ হয়েছে!');
+        setToast('Banner added successfully!');
         setTimeout(() => setToast(null), 3000);
         fetchBanners();
       }
@@ -83,8 +83,8 @@ export default function AdminBannersPage() {
                 onChange={(e) => setType(e.target.value)}
                 className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl font-semibold"
               >
-                <option value="HERO_SLIDER">Hero Slider (শীর্ষ স্লাইডার)</option>
-                <option value="PROMO_BANNER">Promotional Banner (নিচের ব্যানার)</option>
+                <option value="HERO_SLIDER">Hero Slider (Top Carousel)</option>
+                <option value="PROMO_BANNER">Promotional Banner (Bottom Card)</option>
               </select>
             </div>
 
@@ -160,7 +160,7 @@ export default function AdminBannersPage() {
               disabled={loading}
               className="w-full py-2.5 bg-[#cc272d] hover:bg-red-700 text-white font-bold rounded-xl transition"
             >
-              {loading ? 'সংরক্ষণ হচ্ছে...' : 'Add Banner'}
+              {loading ? 'Saving...' : 'Add Banner'}
             </button>
           </form>
         </div>

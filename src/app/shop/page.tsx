@@ -187,9 +187,9 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
                 <div className="w-16 h-16 rounded-full bg-rose-50 text-[#cc272d] flex items-center justify-center mx-auto text-xl font-bold">
                   !
                 </div>
-                <h3 className="text-base font-bold text-gray-900">কোনো পণ্য পাওয়া যায়নি</h3>
+                <h3 className="text-base font-bold text-gray-900">No Products Found</h3>
                 <p className="text-xs sm:text-sm text-gray-500 max-w-sm mx-auto">
-                  আপনার নির্বাচিত ফিল্টার বা কি-ওয়ার্ডের সাথে কোনো পণ্য মেলেনি। অন্য ক্যাটাগরি বা শব্দ দিয়ে চেষ্টা করুন।
+                  No products match your selected filters or search keyword. Try clearing filters or searching for something else.
                 </p>
                 <Link
                   href="/shop"

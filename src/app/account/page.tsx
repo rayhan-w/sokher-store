@@ -35,7 +35,7 @@ export default function AccountPage() {
   if (isLoading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-xs text-gray-500">লোড হচ্ছে...</p>
+        <p className="text-xs text-gray-500">Loading...</p>
       </div>
     );
   }
@@ -119,11 +119,11 @@ export default function AccountPage() {
             </h2>
 
             {ordersLoading ? (
-              <p className="text-xs text-gray-400">অর্ডার লোড হচ্ছে...</p>
+              <p className="text-xs text-gray-400">Loading orders...</p>
             ) : orders.length === 0 ? (
               <div className="text-center py-12 space-y-3">
                 <Clock className="w-10 h-10 text-gray-300 mx-auto" />
-                <p className="text-xs sm:text-sm text-gray-500">আপনার কোনো আগের অর্ডার পাওয়া যায়নি।</p>
+                <p className="text-xs sm:text-sm text-gray-500">You have no order history yet.</p>
                 <Link
                   href="/shop"
                   className="inline-block px-6 py-2.5 rounded-full bg-[#cc272d] text-white text-xs font-semibold"
@@ -141,7 +141,7 @@ export default function AccountPage() {
                           Order #{o.orderNumber}
                         </span>
                         <p className="text-[11px] text-gray-400">
-                          Placed on: {new Date(o.createdAt).toLocaleDateString('bn-BD')}
+                          Placed on: {new Date(o.createdAt).toLocaleDateString('en-US')}
                         </p>
                       </div>
                       <div className="flex items-center gap-2">

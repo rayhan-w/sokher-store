@@ -33,7 +33,7 @@ export default function AdminOrderDetailPage({ params }: { params: { id: string 
   const handleUpdateStatus = async (newStatus: string) => {
     if (newStatus === 'CANCELLED') {
       const confirmCancel = confirm(
-        'আপনি কি নিশ্চিত যে এই অর্ডারটি বাতিল করতে চান? এতে পণ্যের স্টক ঠিক একবার ডেটাবেসে ফেরত আসবে।'
+        'Are you sure you want to cancel this order? This will restore product inventory back to database stock exactly once.'
       );
       if (!confirmCancel) return;
     }
@@ -48,14 +48,14 @@ export default function AdminOrderDetailPage({ params }: { params: { id: string 
       const data = await res.json();
 
       if (res.ok) {
-        setToast(data.message || `অর্ডার স্ট্যাটাস ${newStatus} করা হয়েছে।`);
+        setToast(data.message || `Order status updated to ${newStatus}.`);
         fetchOrderDetail();
         setTimeout(() => setToast(null), 4000);
       } else {
-        alert(data.error || 'আপডেট করতে সমস্যা হয়েছে।');
+        alert(data.error || 'Failed to update order.');
       }
     } catch {
-      alert('সার্ভারে সমস্যা হয়েছে।');
+      alert('Server error.');
     } finally {
       setActionLoading(false);
     }
@@ -72,19 +72,19 @@ export default function AdminOrderDetailPage({ params }: { params: { id: string 
       const data = await res.json();
 
       if (res.ok) {
-        setToast(`পেমেন্ট স্ট্যাটাস ${newPaymentStatus} করা হয়েছে।`);
+        setToast(`Payment status updated to ${newPaymentStatus}.`);
         fetchOrderDetail();
         setTimeout(() => setToast(null), 3500);
       }
     } catch {
-      alert('সার্ভারে সমস্যা হয়েছে।');
+      alert('Server error.');
     } finally {
       setActionLoading(false);
     }
   };
 
   if (loading || !order) {
-    return <div className="p-8 text-xs text-gray-500">অর্ডার বিস্তারিত লোড হচ্ছে...</div>;
+    return <div className="p-8 text-xs text-gray-500">Loading order details...</div>;
   }
 
   return (
@@ -277,7 +277,7 @@ export default function AdminOrderDetailPage({ params }: { params: { id: string 
           {order.isStockRestored && (
             <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center gap-2">
               <ShieldAlert className="w-4 h-4 text-amber-600 flex-shrink-0" />
-              <span>এই অর্ডারের জন্য পণ্য স্টক ফিরিয়ে নেওয়া হয়েছে (Stock Restored).</span>
+              <span>Inventory stock has been restored for this order (Stock Restored).</span>
             </div>
           )}
         </div>

@@ -7,7 +7,7 @@ export async function POST(request: Request) {
     const { email, password } = await request.json();
 
     if (!email || !password) {
-      return NextResponse.json({ error: 'ইমেইল এবং পাসওয়ার্ড আবশ্যক (Email and password are required).' }, { status: 400 });
+      return NextResponse.json({ error: 'Email and password are required.' }, { status: 400 });
     }
 
     const user = await prisma.user.findUnique({
@@ -15,12 +15,12 @@ export async function POST(request: Request) {
     });
 
     if (!user) {
-      return NextResponse.json({ error: 'ভুল ইমেইল বা পাসওয়ার্ড (Invalid email or password).' }, { status: 401 });
+      return NextResponse.json({ error: 'Invalid email or password.' }, { status: 401 });
     }
 
     const isValid = await comparePassword(password, user.password);
     if (!isValid) {
-      return NextResponse.json({ error: 'ভুল ইমেইল বা পাসওয়ার্ড (Invalid email or password).' }, { status: 401 });
+      return NextResponse.json({ error: 'Invalid email or password.' }, { status: 401 });
     }
 
     const token = signToken({
@@ -52,6 +52,6 @@ export async function POST(request: Request) {
 
     return response;
   } catch (error: any) {
-    return NextResponse.json({ error: error.message || 'সার্ভার ত্রুটি (Server error)' }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Server error' }, { status: 500 });
   }
 }

@@ -30,7 +30,7 @@ export default function AnnouncementBar({ settings }: AnnouncementBarProps) {
 
   const announcement =
     settings.announcementText ||
-    `সারা দেশে দ্রুত ক্যাশ অন ডেলিভারি | ৳${defaultThreshold} বা তার বেশি অর্ডারে ফ্রি ডেলিভারি!`;
+    `Fast Cash on Delivery all over Bangladesh | Free Shipping on orders over ৳${defaultThreshold}!`;
 
   return (
     // Hidden on mobile to match Ghorer Bazar clean mobile layout exactly
@@ -41,11 +41,11 @@ export default function AnnouncementBar({ settings }: AnnouncementBarProps) {
           <a
             href={`tel:${cleanPhone}`}
             className="flex items-center gap-1.5 font-medium hover:text-rose-200 transition"
-            title="হটলাইনে কল করুন"
+            title="Call hotline"
           >
             <Phone className="w-3.5 h-3.5 text-yellow-300 animate-pulse" />
             <span>
-              হটলাইন: <strong className="font-bold">{hotline}</strong>
+              Hotline: <strong className="font-bold">{hotline}</strong>
             </span>
           </a>
 
@@ -54,7 +54,7 @@ export default function AnnouncementBar({ settings }: AnnouncementBarProps) {
             target="_blank"
             rel="noopener noreferrer"
             className="hidden md:flex items-center gap-1 hover:text-emerald-300 transition"
-            title="WhatsApp-এ যোগাযোগ করুন"
+            title="Chat on WhatsApp"
           >
             <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
             <span className="font-medium">WhatsApp</span>
@@ -74,7 +74,7 @@ export default function AnnouncementBar({ settings }: AnnouncementBarProps) {
             className="flex items-center gap-1 text-rose-100 hover:text-white transition"
           >
             <Package className="w-3.5 h-3.5 text-yellow-300" />
-            <span>অর্ডার ট্র্যাক</span>
+            <span>Track Order</span>
           </Link>
 
           <span className="text-red-400">|</span>
@@ -93,7 +93,7 @@ export default function AnnouncementBar({ settings }: AnnouncementBarProps) {
               className="flex items-center gap-1 hover:text-rose-200 transition"
             >
               <User className="w-3.5 h-3.5" />
-              <span>লগইন / রেজিস্টার</span>
+              <span>Login / Register</span>
             </Link>
           )}
         </div>

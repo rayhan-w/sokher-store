@@ -49,7 +49,7 @@ export default function AdminCouponsPage() {
         setDiscountValue('');
         setMinOrderAmount('');
         setMaxDiscountCap('');
-        setToast('কুপন তৈরি সম্পন্ন হয়েছে!');
+        setToast('Coupon created successfully!');
         setTimeout(() => setToast(null), 3000);
         fetchCoupons();
       }
@@ -146,7 +146,7 @@ export default function AdminCouponsPage() {
               disabled={loading}
               className="w-full py-2.5 bg-[#cc272d] hover:bg-red-700 text-white font-bold rounded-xl transition"
             >
-              {loading ? 'তৈরি হচ্ছে...' : 'Create Coupon'}
+              {loading ? 'Creating...' : 'Create Coupon'}
             </button>
           </form>
         </div>

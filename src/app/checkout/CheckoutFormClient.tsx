@@ -59,27 +59,27 @@ export default function CheckoutFormClient({ settings }: CheckoutFormProps) {
     setErrorMsg('');
 
     if (items.length === 0) {
-      setErrorMsg('আপনার কার্ট খালি রয়েছে (Cart is empty).');
+      setErrorMsg('Your cart is empty.');
       return;
     }
 
     if (!customerName.trim()) {
-      setErrorMsg('অনুগ্রহ করে আপনার পুরো নাম দিন।');
+      setErrorMsg('Please enter your full name.');
       return;
     }
 
     if (!customerPhone.trim() || !/^01[3-9]\d{8}$/.test(customerPhone.trim().replace(/[^0-9]/g, ''))) {
-      setErrorMsg('সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন (যেমন: 01712345678)।');
+      setErrorMsg('Please enter a valid 11-digit phone number (e.g. 01712345678).');
       return;
     }
 
     if (!shippingAddress.trim()) {
-      setErrorMsg('সম্পূর্ণ ডেলিভারি ঠিকানা লিখুন (রোড, বাসা, থানা/এলাকা)।');
+      setErrorMsg('Please enter your complete delivery address.');
       return;
     }
 
     if ((paymentMethod === 'BKASH' || paymentMethod === 'NAGAD') && (!senderNumber.trim() || !trxId.trim())) {
-      setErrorMsg('অনুগ্রহ করে বিকাশ/নগদ প্রেরক নম্বর এবং TrxID প্রদান করুন।');
+      setErrorMsg('Please provide your sender number and transaction ID (TrxID).');
       return;
     }
 
@@ -113,7 +113,7 @@ export default function CheckoutFormClient({ settings }: CheckoutFormProps) {
       const data = await res.json();
 
       if (!res.ok) {
-        setErrorMsg(data.error || 'অর্ডার সম্পন্ন করা যায়নি।');
+        setErrorMsg(data.error || 'Failed to place order.');
         setLoading(false);
         return;
       }
@@ -140,7 +140,7 @@ export default function CheckoutFormClient({ settings }: CheckoutFormProps) {
       // Redirect to Order Success Page
       router.push(`/order-success/${data.orderNumber}`);
     } catch {
-      setErrorMsg('সার্ভারের সাথে সংযোগ ব্যর্থ হয়েছে। পুনরায় চেষ্টা করুন।');
+      setErrorMsg('Connection error. Please try again.');
       setLoading(false);
     }
   };
@@ -151,7 +151,7 @@ export default function CheckoutFormClient({ settings }: CheckoutFormProps) {
         <div className="w-16 h-16 rounded-full bg-rose-50 text-[#cc272d] flex items-center justify-center mx-auto">
           <ShoppingBag className="w-8 h-8" />
         </div>
-        <h2 className="text-xl font-bold text-gray-900">চেকআউট করার জন্য কার্টে কোনো পণ্য নেই</h2>
+        <h2 className="text-xl font-bold text-gray-900">Your shopping cart is empty</h2>
         <Link
           href="/shop"
           className="inline-block px-8 py-3 rounded-full bg-[#cc272d] text-white text-sm font-semibold hover:bg-red-700 shadow-md transition"
@@ -180,13 +180,13 @@ export default function CheckoutFormClient({ settings }: CheckoutFormProps) {
           <div className="bg-white rounded-3xl border border-gray-100 p-6 sm:p-8 shadow-sm space-y-4">
             <h2 className="text-base font-bold text-gray-900 border-b border-gray-100 pb-3 flex items-center gap-2">
               <span className="w-6 h-6 rounded-full bg-[#cc272d] text-white text-xs flex items-center justify-center font-bold">1</span>
-              Customer Details (ক্রেতার তথ্য)
+              Customer Details
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-gray-700 mb-1">
-                  Full Name (আপনার নাম) *
+                  Full Name *
                 </label>
                 <input
                   type="text"
@@ -200,7 +200,7 @@ export default function CheckoutFormClient({ settings }: CheckoutFormProps) {
 
               <div>
                 <label className="block text-xs font-semibold text-gray-700 mb-1">
-                  Phone Number (মোবাইল নম্বর) *
+                  Phone Number *
                 </label>
                 <input
                   type="tel"
@@ -214,7 +214,7 @@ export default function CheckoutFormClient({ settings }: CheckoutFormProps) {
 
               <div className="sm:col-span-2">
                 <label className="block text-xs font-semibold text-gray-700 mb-1">
-                  Email Address (ইমেইল - ঐচ্ছিক)
+                  Email Address (Optional)
                 </label>
                 <input
                   type="email"
@@ -227,12 +227,12 @@ export default function CheckoutFormClient({ settings }: CheckoutFormProps) {
 
               <div className="sm:col-span-2">
                 <label className="block text-xs font-semibold text-gray-700 mb-1">
-                  Full Delivery Address (সম্পূর্ণ ঠিকানা) *
+                  Full Delivery Address *
                 </label>
                 <textarea
                   required
                   rows={3}
-                  placeholder="বাসা নম্বর, রোড নম্বর, এলাকা/থানা, জেলা"
+                  placeholder="House number, road number, area, city/district"
                   value={shippingAddress}
                   onChange={(e) => setShippingAddress(e.target.value)}
                   className="w-full p-3 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#cc272d]"
@@ -245,28 +245,28 @@ export default function CheckoutFormClient({ settings }: CheckoutFormProps) {
           <div className="bg-white rounded-3xl border border-gray-100 p-6 sm:p-8 shadow-sm space-y-4">
             <h2 className="text-base font-bold text-gray-900 border-b border-gray-100 pb-3 flex items-center gap-2">
               <span className="w-6 h-6 rounded-full bg-[#cc272d] text-white text-xs flex items-center justify-center font-bold">2</span>
-              Delivery Zone (ডেলিভারি এলাকা)
+              Delivery Zone
             </h2>
 
             <div className="space-y-3">
               {[
                 {
                   id: 'DHAKA',
-                  label: 'Inside Dhaka (ঢাকা সিটি)',
+                  label: 'Inside Dhaka City',
                   charge: settings.deliveryDhaka,
-                  desc: 'ডেলিভারি সময়: ২৪-৪৮ ঘণ্টা',
+                  desc: 'Delivery within 24-48 hours',
                 },
                 {
                   id: 'DHAKA_SUBURB',
-                  label: 'Dhaka Suburbs (সাভার, কেরানীগঞ্জ, টঙ্গী, গাজীপুর)',
+                  label: 'Dhaka Suburbs (Savar, Keraniganj, Tongi, Gazipur)',
                   charge: settings.deliveryDhakaSuburbs,
-                  desc: 'ডেলিভারি সময়: ২-৩ দিন',
+                  desc: 'Delivery within 2-3 days',
                 },
                 {
                   id: 'OUTSIDE_DHAKA',
-                  label: 'Outside Dhaka (ঢাকার বাইরে সারা বাংলাদেশ)',
+                  label: 'Outside Dhaka (All over Bangladesh)',
                   charge: settings.deliveryOutsideDhaka,
-                  desc: 'হোম ডেলিভারি: ৩-৪ দিন',
+                  desc: 'Home delivery within 3-4 days',
                 },
               ].map((zone) => (
                 <label
@@ -303,7 +303,7 @@ export default function CheckoutFormClient({ settings }: CheckoutFormProps) {
           <div className="bg-white rounded-3xl border border-gray-100 p-6 sm:p-8 shadow-sm space-y-4">
             <h2 className="text-base font-bold text-gray-900 border-b border-gray-100 pb-3 flex items-center gap-2">
               <span className="w-6 h-6 rounded-full bg-[#cc272d] text-white text-xs flex items-center justify-center font-bold">3</span>
-              Payment Method (পেমেন্ট পদ্ধতি)
+              Payment Method
             </h2>
 
             <div className="space-y-3">
@@ -325,8 +325,8 @@ export default function CheckoutFormClient({ settings }: CheckoutFormProps) {
                     className="text-[#cc272d] focus:ring-[#cc272d]"
                   />
                   <div>
-                    <p className="text-xs sm:text-sm font-bold text-gray-900">Cash on Delivery (ক্যাশ অন ডেলিভারি)</p>
-                    <p className="text-[11px] text-gray-500">পণ্য হাতে পেয়ে মূল্য পরিশোধ করুন।</p>
+                    <p className="text-xs sm:text-sm font-bold text-gray-900">Cash on Delivery</p>
+                    <p className="text-[11px] text-gray-500">Pay cash upon receiving the order at your doorstep.</p>
                   </div>
                 </div>
               </label>
@@ -349,20 +349,20 @@ export default function CheckoutFormClient({ settings }: CheckoutFormProps) {
                     className="text-[#cc272d] focus:ring-[#cc272d]"
                   />
                   <div>
-                    <p className="text-xs sm:text-sm font-bold text-pink-700">bKash Payment (বিকাশ)</p>
-                    <p className="text-[11px] text-gray-500">বিকাশ সেন্ড মানি বা পেমেন্ট করে TrxID দিন।</p>
+                    <p className="text-xs sm:text-sm font-bold text-pink-700">bKash Payment</p>
+                    <p className="text-[11px] text-gray-500">Send money to our bKash number and provide the TrxID.</p>
                   </div>
                 </div>
 
                 {paymentMethod === 'BKASH' && (
                   <div className="mt-4 pt-3 border-t border-pink-100 text-xs space-y-3">
                     <p className="text-gray-700 font-medium">
-                      আমাদের বিকাশ মার্চেন্ট/পার্সোনাল নম্বর: <strong className="text-pink-600 font-bold">{settings.bkashNumber || '01712345678'}</strong>
+                      Our bKash Number: <strong className="text-pink-600 font-bold">{settings.bkashNumber || '01712345678'}</strong>
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
                         <label className="block text-[11px] font-semibold text-gray-600 mb-1">
-                          আপনার বিকাশ নম্বর (Sender Number) *
+                          Your bKash Number (Sender Number) *
                         </label>
                         <input
                           type="tel"
@@ -374,7 +374,7 @@ export default function CheckoutFormClient({ settings }: CheckoutFormProps) {
                       </div>
                       <div>
                         <label className="block text-[11px] font-semibold text-gray-600 mb-1">
-                          TrxID (ট্রানজেকশন আইডি) *
+                          TrxID (Transaction ID) *
                         </label>
                         <input
                           type="text"
@@ -407,20 +407,20 @@ export default function CheckoutFormClient({ settings }: CheckoutFormProps) {
                     className="text-[#cc272d] focus:ring-[#cc272d]"
                   />
                   <div>
-                    <p className="text-xs sm:text-sm font-bold text-orange-700">Nagad Payment (নগদ)</p>
-                    <p className="text-[11px] text-gray-500">নগদ সেন্ড মানি করে TrxID প্রদান করুন।</p>
+                    <p className="text-xs sm:text-sm font-bold text-orange-700">Nagad Payment</p>
+                    <p className="text-[11px] text-gray-500">Send money to our Nagad number and provide the TrxID.</p>
                   </div>
                 </div>
 
                 {paymentMethod === 'NAGAD' && (
                   <div className="mt-4 pt-3 border-t border-orange-100 text-xs space-y-3">
                     <p className="text-gray-700 font-medium">
-                      আমাদের নগদ নম্বর: <strong className="text-orange-600 font-bold">{settings.nagadNumber || '01812345678'}</strong>
+                      Our Nagad Number: <strong className="text-orange-600 font-bold">{settings.nagadNumber || '01812345678'}</strong>
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
                         <label className="block text-[11px] font-semibold text-gray-600 mb-1">
-                          আপনার নগদ নম্বর (Sender Number) *
+                          Your Nagad Number (Sender Number) *
                         </label>
                         <input
                           type="tel"
@@ -432,7 +432,7 @@ export default function CheckoutFormClient({ settings }: CheckoutFormProps) {
                       </div>
                       <div>
                         <label className="block text-[11px] font-semibold text-gray-600 mb-1">
-                          TrxID (ট্রানজেকশন আইডি) *
+                          TrxID (Transaction ID) *
                         </label>
                         <input
                           type="text"
@@ -512,7 +512,7 @@ export default function CheckoutFormClient({ settings }: CheckoutFormProps) {
             disabled={loading}
             className="w-full py-4 px-6 rounded-2xl bg-[#cc272d] hover:bg-red-700 text-white text-sm sm:text-base font-bold shadow-xl shadow-red-500/25 transition flex items-center justify-center gap-2 active:scale-98 disabled:opacity-40"
           >
-            {loading ? 'অর্ডার প্রসেস হচ্ছে...' : `Confirm Order (${formatPrice(totalAmount)})`}
+            {loading ? 'Processing Order...' : `Confirm Order (${formatPrice(totalAmount)})`}
           </button>
         </div>
       </div>

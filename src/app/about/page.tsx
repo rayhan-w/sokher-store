@@ -20,33 +20,33 @@ export default function AboutPage() {
             Your Beauty, Our Passion
           </h1>
           <p className="text-sm text-gray-500 max-w-xl mx-auto leading-relaxed">
-            শখের স্টোর বাংলাদেশের একটি নির্ভরযোগ্য প্রিমিয়াম অনলাইন কসমেটিকস ও রূপচর্চা পণ্য বিপণন প্ল্যাটফর্ম।
+            Sokher Store is your trusted premium online destination for cosmetics, skincare, and beauty care in Bangladesh.
           </p>
         </div>
 
         <div className="bg-white rounded-3xl border border-gray-100 p-8 sm:p-12 shadow-sm space-y-6 text-xs sm:text-sm text-gray-700 leading-relaxed">
-          <h2 className="text-lg font-bold text-gray-900">আমাদের প্রতিশ্রুতি ও লক্ষ্য</h2>
+          <h2 className="text-lg font-bold text-gray-900">Our Promise & Mission</h2>
           <p>
-            আমরা বিশ্বাস করি প্রতিটি নারী ও পুরুষের প্রাকৃতিক সৌন্দর্য অমূল্য। সঠিক ও খাঁটি প্রসাধন ব্যবহারের মাধ্যমে আপনার আত্মবিশ্বাস বৃদ্ধি করাই আমাদের মূল লক্ষ্য। শখের স্টোর থেকে অর্ডারকৃত প্রতিটি পণ্য সরাসরি অফিসিয়াল পরিবেশক ও অনুমোদিত সোর্স থেকে সংগৃহীত।
+            We believe natural beauty is invaluable. Our mission is to boost your confidence with 100% authentic, high-quality skincare and cosmetic products. Every item sold at Sokher Store is sourced directly from official distributors and verified global brands.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-6 border-t border-gray-100">
             <div className="p-4 rounded-2xl bg-rose-50/60 border border-rose-100 space-y-2">
               <ShieldCheck className="w-6 h-6 text-[#cc272d]" />
-              <h3 className="font-bold text-gray-900">১০০% আসল পণ্য</h3>
-              <p className="text-[11px] text-gray-500">কোনো নকল বা মেয়াদোত্তীর্ণ পণ্য আমাদের স্টোরে বিক্রি করা হয় না।</p>
+              <h3 className="font-bold text-gray-900">100% Authentic</h3>
+              <p className="text-[11px] text-gray-500">Zero counterfeit or expired goods. Guaranteed original cosmetics.</p>
             </div>
 
             <div className="p-4 rounded-2xl bg-rose-50/60 border border-rose-100 space-y-2">
               <Sparkles className="w-6 h-6 text-[#cc272d]" />
-              <h3 className="font-bold text-gray-900">দ্রুততম হোম ডেলিভারি</h3>
-              <p className="text-[11px] text-gray-500">ঢাকা সিটিতে ২৪-৪৮ ঘণ্টার মধ্যে এবং সারা দেশে সর্বোচ্চ ৩-৪ দিনে ডেলিভারি।</p>
+              <h3 className="font-bold text-gray-900">Fast Express Delivery</h3>
+              <p className="text-[11px] text-gray-500">24-48 hours inside Dhaka and 2-4 days across Bangladesh.</p>
             </div>
 
             <div className="p-4 rounded-2xl bg-rose-50/60 border border-rose-100 space-y-2">
               <Heart className="w-6 h-6 text-[#cc272d]" />
-              <h3 className="font-bold text-gray-900">২৪/৭ গ্রাহক সেবা</h3>
-              <p className="text-[11px] text-gray-500">যেকোনো প্রশ্ন বা পরামর্শের জন্য আমাদের হেল্পলাইন ও AI অ্যাসিস্ট্যান্ট প্রস্তুত।</p>
+              <h3 className="font-bold text-gray-900">Dedicated Support</h3>
+              <p className="text-[11px] text-gray-500">Our customer support helpline and live chat are ready to assist you anytime.</p>
             </div>
           </div>
         </div>

@@ -123,18 +123,18 @@ export default function Header({ settings, categories = [] }: HeaderProps) {
   };
 
   const navLinks = [
-    { label: 'হোম', href: '/' },
-    { label: 'সকল পণ্য', href: '/shop' },
-    { label: 'অফার জোন', href: '/shop?badge=FLASH_SALE', isHot: true },
-    { label: 'নতুন কালেকশন', href: '/shop?sort=newest' },
-    { label: 'আমাদের সম্পর্কে', href: '/about' },
-    { label: 'যোগাযোগ', href: '/contact' },
+    { label: 'Home', href: '/' },
+    { label: 'Shop', href: '/shop' },
+    { label: 'Offers', href: '/shop?badge=FLASH_SALE', isHot: true },
+    { label: 'New Arrivals', href: '/shop?sort=newest' },
+    { label: 'About Us', href: '/about' },
+    { label: 'Contact', href: '/contact' },
   ];
 
   return (
     <header className="sticky top-0 z-40 bg-white shadow-xs border-b border-gray-100">
       {/* ========================================================= */}
-      {/* 1. MOBILE HEADER (EXACT 1:1 MATCH TO USER SCREENSHOT)     */}
+      {/* 1. MOBILE HEADER (Clean & Minimalist like Screenshot)     */}
       {/* ========================================================= */}
       <div className="lg:hidden bg-white px-4 py-2.5 flex items-center justify-between">
         {/* Left: Hamburger Icon (☰) */}
@@ -146,7 +146,7 @@ export default function Header({ settings, categories = [] }: HeaderProps) {
           <Menu className="w-6 h-6 stroke-[2.2]" />
         </button>
 
-        {/* Center: Brand Logo (Centered like screenshot) */}
+        {/* Center: Brand Logo */}
         <Link href="/" className="flex items-center gap-2">
           <div className="relative w-8 h-8 rounded-lg overflow-hidden bg-[#e11d2e] flex items-center justify-center shadow-xs">
             <Image
@@ -182,7 +182,7 @@ export default function Header({ settings, categories = [] }: HeaderProps) {
       </div>
 
       {/* ========================================================= */}
-      {/* 2. MOBILE SEARCH MODAL (Opens when user taps SEARCH)     */}
+      {/* 2. MOBILE SEARCH MODAL (Triggered from Bottom Bar SEARCH) */}
       {/* ========================================================= */}
       {mobileSearchOpen && (
         <div className="fixed inset-0 z-50 lg:hidden bg-black/60 backdrop-blur-xs flex flex-col">
@@ -195,15 +195,15 @@ export default function Header({ settings, categories = [] }: HeaderProps) {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="পণ্য সার্চ করুন (যেমন: লিপস্টিক, সিরাম)..."
-                  className="w-full pl-9 pr-14 py-2.5 text-xs bg-gray-50 border-2 border-[#cc272d] rounded-xl focus:outline-none focus:bg-white"
+                  placeholder="Search products (e.g. Lipstick, Serum)..."
+                  className="w-full pl-9 pr-16 py-2.5 text-xs bg-gray-50 border-2 border-[#cc272d] rounded-xl focus:outline-none focus:bg-white"
                   autoFocus
                 />
                 <button
                   type="submit"
                   className="absolute right-1 top-1 bottom-1 px-3 bg-[#cc272d] text-white text-xs font-bold rounded-lg"
                 >
-                  সার্চ
+                  Search
                 </button>
               </form>
               <button
@@ -250,7 +250,7 @@ export default function Header({ settings, categories = [] }: HeaderProps) {
       )}
 
       {/* ========================================================= */}
-      {/* 3. DESKTOP 2-TIER NAVBAR (Full Rich Experience for PC)    */}
+      {/* 3. DESKTOP 2-TIER NAVBAR (Full PC Experience)             */}
       {/* ========================================================= */}
       <div className="hidden lg:block">
         {/* Tier 1: Main Header Row */}
@@ -273,7 +273,7 @@ export default function Header({ settings, categories = [] }: HeaderProps) {
                   <span className="text-[#cc272d]">Sokher</span> Store
                 </span>
                 <span className="text-[11px] text-gray-500 font-semibold tracking-wider uppercase">
-                  শখের স্টোর • বিউটি কেয়ার
+                  BEAUTY & PERSONAL CARE
                 </span>
               </div>
             </Link>
@@ -286,7 +286,7 @@ export default function Header({ settings, categories = [] }: HeaderProps) {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
-                  placeholder="পণ্য সার্চ করুন (যেমন: লিপস্টিক, ময়েশ্চারাইজার, সানস্ক্রিন...)"
+                  placeholder="Search for cosmetics, skincare, perfumes..."
                   className="w-full pl-4 pr-24 py-2.5 text-sm bg-gray-50/80 border-2 border-[#cc272d] rounded-lg focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#cc272d]/20 transition placeholder:text-gray-400"
                 />
                 <button
@@ -294,7 +294,7 @@ export default function Header({ settings, categories = [] }: HeaderProps) {
                   className="absolute right-1 top-1 bottom-1 px-5 bg-[#cc272d] hover:bg-red-700 text-white rounded-md text-sm font-bold flex items-center gap-1.5 transition shadow-sm"
                 >
                   <Search className="w-4 h-4" />
-                  <span>সার্চ</span>
+                  <span>Search</span>
                 </button>
               </form>
 
@@ -302,8 +302,8 @@ export default function Header({ settings, categories = [] }: HeaderProps) {
               {showSuggestions && suggestions.length > 0 && (
                 <div className="absolute top-full left-0 right-0 mt-1.5 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden z-50">
                   <div className="px-3 py-2 text-[11px] font-bold text-gray-500 bg-rose-50/60 border-b flex items-center justify-between">
-                    <span>অনুসন্ধান ফলাফল</span>
-                    <span>{suggestions.length} টি পণ্য পাওয়া গেছে</span>
+                    <span>Search Results</span>
+                    <span>{suggestions.length} items found</span>
                   </div>
                   <div className="max-h-80 overflow-y-auto divide-y divide-gray-100">
                     {suggestions.map((p) => (
@@ -345,7 +345,7 @@ export default function Header({ settings, categories = [] }: HeaderProps) {
                       onClick={handleSearchSubmit}
                       className="text-xs text-[#cc272d] font-bold hover:underline"
                     >
-                      সকল ফলাফল দেখুন →
+                      View All Results →
                     </button>
                   </div>
                 </div>
@@ -362,7 +362,7 @@ export default function Header({ settings, categories = [] }: HeaderProps) {
                   <PhoneCall className="w-4 h-4" />
                 </div>
                 <div className="flex flex-col text-left">
-                  <span className="text-[10px] font-medium text-gray-500">ফোনে অর্ডার করুন</span>
+                  <span className="text-[10px] font-medium text-gray-500">Call to Order</span>
                   <span className="text-xs font-black text-gray-900 group-hover:text-[#cc272d] transition">
                     {hotline}
                   </span>
@@ -372,7 +372,8 @@ export default function Header({ settings, categories = [] }: HeaderProps) {
               <Link
                 href="/account/wishlist"
                 className="relative p-2 text-gray-700 hover:text-[#cc272d] hover:bg-rose-50/50 rounded-lg transition"
-                aria-label="উইশলিস্ট"
+                aria-label="Wishlist"
+                title="Wishlist"
               >
                 <Heart className="w-6 h-6" />
                 {totalWishlist > 0 && (
@@ -395,7 +396,7 @@ export default function Header({ settings, categories = [] }: HeaderProps) {
                   )}
                 </div>
                 <div className="flex flex-col text-left leading-none">
-                  <span className="text-[10px] text-rose-200 font-medium">কার্ট</span>
+                  <span className="text-[10px] text-rose-200 font-medium">Cart</span>
                   <span className="text-xs font-black">{formatPrice(subtotal)}</span>
                 </div>
               </button>
@@ -414,7 +415,7 @@ export default function Header({ settings, categories = [] }: HeaderProps) {
                   className="bg-[#cc272d] hover:bg-red-700 text-white font-bold text-sm px-5 py-2.5 rounded-t-md flex items-center gap-2.5 transition shadow-sm"
                 >
                   <LayoutGrid className="w-4 h-4" />
-                  <span>সকল ক্যাটাগরি</span>
+                  <span>All Categories</span>
                   <ChevronDown
                     className={`w-4 h-4 ml-1 transition-transform duration-200 ${
                       categoryDropdownOpen ? 'rotate-180' : ''
@@ -468,7 +469,7 @@ export default function Header({ settings, categories = [] }: HeaderProps) {
                         onClick={() => setCategoryDropdownOpen(false)}
                         className="block text-center text-xs font-bold text-[#cc272d] hover:underline py-1"
                       >
-                        সকল ক্যাটাগরি ও পণ্য দেখুন →
+                        View All Categories →
                       </Link>
                     </div>
                   </div>
@@ -508,7 +509,7 @@ export default function Header({ settings, categories = [] }: HeaderProps) {
               className="flex items-center gap-1.5 text-xs font-bold text-[#cc272d] bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-full border border-rose-200 transition"
             >
               <Truck className="w-3.5 h-3.5" />
-              <span>অর্ডার ট্র্যাক করুন</span>
+              <span>Track Order</span>
             </Link>
           </div>
         </div>
@@ -538,7 +539,7 @@ export default function Header({ settings, categories = [] }: HeaderProps) {
                 </div>
                 <div className="leading-tight">
                   <h3 className="text-base font-black">Sokher Store</h3>
-                  <p className="text-[10px] text-rose-200 font-medium">শখের স্টোর কসমেটিক্স</p>
+                  <p className="text-[10px] text-rose-200 font-medium">Beauty & Skincare</p>
                 </div>
               </div>
               <button
@@ -556,10 +557,10 @@ export default function Header({ settings, categories = [] }: HeaderProps) {
                 className="flex items-center gap-2 text-xs font-bold text-[#cc272d]"
               >
                 <PhoneCall className="w-4 h-4 animate-bounce" />
-                <span>হটলাইন: {hotline}</span>
+                <span>Hotline: {hotline}</span>
               </a>
               <span className="text-[10px] bg-[#cc272d] text-white px-2 py-0.5 rounded-full font-bold">
-                ২৪/৭ কল
+                24/7 Call
               </span>
             </div>
 
@@ -568,7 +569,7 @@ export default function Header({ settings, categories = [] }: HeaderProps) {
               {/* Main Links */}
               <div>
                 <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
-                  মেনু
+                  Navigation Menu
                 </h4>
                 <div className="space-y-1">
                   {navLinks.map((link) => (
@@ -595,13 +596,13 @@ export default function Header({ settings, categories = [] }: HeaderProps) {
               {/* Categories Section */}
               <div className="border-t border-gray-100 pt-3">
                 <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2 flex items-center justify-between">
-                  <span>সকল ক্যাটাগরি</span>
+                  <span>Product Categories</span>
                   <Link
                     href="/shop"
                     onClick={() => setMobileMenuOpen(false)}
                     className="text-[10px] text-[#cc272d] font-bold"
                   >
-                    সব দেখুন →
+                    View All →
                   </Link>
                 </h4>
                 <div className="space-y-1">
@@ -662,7 +663,7 @@ export default function Header({ settings, categories = [] }: HeaderProps) {
                 className="w-full py-2.5 px-4 rounded-lg bg-gray-900 text-white text-xs font-bold flex items-center justify-center gap-2 hover:bg-gray-800 transition"
               >
                 <Truck className="w-4 h-4" />
-                <span>আমার অ্যাকাউন্ট ও অর্ডার ট্র্যাক</span>
+                <span>My Account & Track Order</span>
               </Link>
             </div>
           </div>

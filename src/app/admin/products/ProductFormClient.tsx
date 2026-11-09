@@ -96,7 +96,7 @@ export default function ProductFormClient({ initialProduct, categories }: Produc
 
   const handleAiGenerateDescription = async () => {
     if (!name.trim()) {
-      setErrorMsg('AI ডেসক্রিপশন তৈরি করার জন্য প্রথমে পণ্যের নাম লিখুন।');
+      setErrorMsg('Please enter a product name first to generate an AI description.');
       return;
     }
 
@@ -125,7 +125,7 @@ export default function ProductFormClient({ initialProduct, categories }: Produc
         if (!seoDescription) setSeoDescription(data.descriptions.bangla.slice(0, 150));
       }
     } catch {
-      setErrorMsg('AI ডেসক্রিপশন জেনারেট করতে সমস্যা হয়েছে।');
+      setErrorMsg('Failed to generate AI description.');
     } finally {
       setLoadingAi(false);
     }
@@ -178,18 +178,18 @@ export default function ProductFormClient({ initialProduct, categories }: Produc
       const data = await res.json();
 
       if (!res.ok) {
-        setErrorMsg(data.error || 'পণ্য সংরক্ষণ করা যায়নি।');
+        setErrorMsg(data.error || 'Failed to save product.');
         setLoading(false);
         return;
       }
 
-      setSuccessMsg(data.message || 'পণ্য সফলভাবে সংরক্ষিত হয়েছে!');
+      setSuccessMsg(data.message || 'Product saved successfully!');
       setTimeout(() => {
         router.push('/admin/products');
         router.refresh();
       }, 1000);
     } catch {
-      setErrorMsg('সার্ভারে সমস্যা হয়েছে।');
+      setErrorMsg('Server connection error.');
       setLoading(false);
     }
   };
@@ -220,7 +220,7 @@ export default function ProductFormClient({ initialProduct, categories }: Produc
           disabled={loading}
           className="px-6 py-2.5 rounded-xl bg-[#cc272d] hover:bg-red-700 text-white font-bold text-xs sm:text-sm shadow-md transition disabled:opacity-40"
         >
-          {loading ? 'সংরক্ষণ হচ্ছে...' : isEdit ? 'Update Product' : 'Save Product'}
+          {loading ? 'Saving...' : isEdit ? 'Update Product' : 'Save Product'}
         </button>
       </div>
 
@@ -247,7 +247,7 @@ export default function ProductFormClient({ initialProduct, categories }: Produc
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
           <div className="sm:col-span-2">
             <label className="block font-semibold text-gray-700 mb-1">
-              Product Name (পণ্যের নাম) *
+              Product Name *
             </label>
             <input
               type="text"
@@ -261,7 +261,7 @@ export default function ProductFormClient({ initialProduct, categories }: Produc
 
           <div>
             <label className="block font-semibold text-gray-700 mb-1">
-              SKU (ইউনিক পণ্য কোড) *
+              SKU (Unique Product Code) *
             </label>
             <input
               type="text"
@@ -275,7 +275,7 @@ export default function ProductFormClient({ initialProduct, categories }: Produc
 
           <div>
             <label className="block font-semibold text-gray-700 mb-1">
-              Slug (ইউনিক URL লিংক)
+              Slug (URL Key)
             </label>
             <input
               type="text"
@@ -291,42 +291,42 @@ export default function ProductFormClient({ initialProduct, categories }: Produc
       {/* 2. Pricing & Inventory (Rule #1: Price parser protection) */}
       <div className="bg-white p-6 sm:p-8 rounded-3xl border border-gray-100 shadow-sm space-y-4">
         <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider border-b border-gray-100 pb-3">
-          Pricing & Stock (মূল্য ও ইনভেন্টরি)
+          Pricing & Stock
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
           <div>
             <label className="block font-semibold text-gray-700 mb-1">
-              Selling Price (বিক্রয় মূল্য ৳) *
+              Selling Price (৳) *
             </label>
             <input
               type="text"
               required
-              placeholder="e.g. 1,200 or 1200 or ১২০০"
+              placeholder="e.g. 1,200 or 1200"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#cc272d] font-bold text-gray-900"
             />
-            <span className="text-[10px] text-gray-400 mt-0.5 block">কমা, স্পেস বা বাংলা সংখ্যা সমর্থন করে</span>
+            <span className="text-[10px] text-gray-400 mt-0.5 block">Supports commas, spaces, or numeric digits</span>
           </div>
 
           <div>
             <label className="block font-semibold text-gray-700 mb-1">
-              Regular Price (কাটা দাগের আগের দাম ৳)
+              Regular Price (Strikethrough Price ৳)
             </label>
             <input
               type="text"
-              placeholder="e.g. 1,450 (ঐচ্ছিক)"
+              placeholder="e.g. 1,450 (optional)"
               value={regularPrice}
               onChange={(e) => setRegularPrice(e.target.value)}
               className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#cc272d]"
             />
-            <span className="text-[10px] text-gray-400 mt-0.5 block">ছাড়ের % স্বয়ংক্রিয়ভাবে হিসাব হবে</span>
+            <span className="text-[10px] text-gray-400 mt-0.5 block">Discount % calculated automatically</span>
           </div>
 
           <div>
             <label className="block font-semibold text-gray-700 mb-1">
-              Stock Quantity (মজুদ সংখ্যা) *
+              Stock Quantity *
             </label>
             <input
               type="number"
@@ -341,7 +341,7 @@ export default function ProductFormClient({ initialProduct, categories }: Produc
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 text-xs">
           <div>
-            <label className="block font-semibold text-gray-700 mb-1">Badge (লেবেল)</label>
+            <label className="block font-semibold text-gray-700 mb-1">Badge (Label)</label>
             <select
               value={badge}
               onChange={(e) => setBadge(e.target.value)}
@@ -385,12 +385,12 @@ export default function ProductFormClient({ initialProduct, categories }: Produc
       {/* 3. Category Multi-select & Subcategory (Rule #2) */}
       <div className="bg-white p-6 sm:p-8 rounded-3xl border border-gray-100 shadow-sm space-y-4">
         <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider border-b border-gray-100 pb-3">
-          Categories & Subcategory (ক্যাটাগরি নির্বাচন)
+          Categories & Subcategory
         </h2>
 
         <div className="space-y-3">
           <label className="block text-xs font-semibold text-gray-700">
-            Select Categories (একাধিক নির্বাচন করা যাবে):
+            Select Categories (Multiple selections allowed):
           </label>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
             {categories.map((cat) => {
@@ -416,14 +416,14 @@ export default function ProductFormClient({ initialProduct, categories }: Produc
         {availableSubcategories.length > 0 && (
           <div className="pt-2 text-xs">
             <label className="block font-semibold text-gray-700 mb-1">
-              Select Subcategory (সাবক্যাটাগরি - ঐচ্ছিক)
+              Select Subcategory (Optional)
             </label>
             <select
               value={subcategoryId}
               onChange={(e) => setSubcategoryId(e.target.value)}
               className="w-full sm:w-80 p-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#cc272d]"
             >
-              <option value="">None (কোনোটি নয়)</option>
+              <option value="">None</option>
               {availableSubcategories.map((sub: any) => (
                 <option key={sub.id} value={sub.id}>
                   {sub.name}
@@ -437,7 +437,7 @@ export default function ProductFormClient({ initialProduct, categories }: Produc
       {/* 4. Product Images */}
       <div className="bg-white p-6 sm:p-8 rounded-3xl border border-gray-100 shadow-sm space-y-4">
         <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider border-b border-gray-100 pb-3">
-          Product Images (পণ্যের ছবি)
+          Product Images
         </h2>
 
         {/* Existing Images Preview */}
@@ -487,7 +487,7 @@ export default function ProductFormClient({ initialProduct, categories }: Produc
       <div className="bg-white p-6 sm:p-8 rounded-3xl border border-gray-100 shadow-sm space-y-4">
         <div className="flex items-center justify-between border-b border-gray-100 pb-3">
           <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider">
-            Product Description (বিস্তারিত বিবরণ)
+            Product Description
           </h2>
 
           <button
@@ -497,13 +497,13 @@ export default function ProductFormClient({ initialProduct, categories }: Produc
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-50 text-[#cc272d] hover:bg-rose-100 text-xs font-bold transition border border-rose-100"
           >
             <Sparkles className="w-3.5 h-3.5" />
-            <span>{loadingAi ? 'AI লিখছে...' : 'AI Generate Description'}</span>
+            <span>{loadingAi ? 'Generating...' : 'AI Generate Description'}</span>
           </button>
         </div>
 
         <textarea
           rows={6}
-          placeholder="পণ্যের বিস্তারিত উপকারিতা এবং ব্যবহারের নিয়ম লিখুন..."
+          placeholder="Write detailed product benefits, ingredients, and usage instructions..."
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#cc272d]"
@@ -514,7 +514,7 @@ export default function ProductFormClient({ initialProduct, categories }: Produc
       <div className="bg-white p-6 sm:p-8 rounded-3xl border border-gray-100 shadow-sm space-y-4">
         <div className="flex items-center justify-between border-b border-gray-100 pb-3">
           <h2 className="text-sm font-bold text-gray-900 uppercase tracking-wider">
-            Specifications (বৈশিষ্ট্যাবলী)
+            Specifications
           </h2>
           <button
             type="button"
@@ -584,7 +584,7 @@ export default function ProductFormClient({ initialProduct, categories }: Produc
             <label className="block font-semibold text-gray-700 mb-1">SEO Meta Description</label>
             <textarea
               rows={2}
-              placeholder="Google সার্চ রেজাল্টে যে বিবরণ প্রদর্শিত হবে..."
+              placeholder="Summary displayed in Google search results..."
               value={seoDescription}
               onChange={(e) => setSeoDescription(e.target.value)}
               className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none"

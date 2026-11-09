@@ -121,13 +121,13 @@ export default function AdminOrdersPage() {
               {loading ? (
                 <tr>
                   <td colSpan={8} className="text-center py-12 text-gray-400">
-                    অর্ডার তালিকা লোড হচ্ছে...
+                    Loading orders...
                   </td>
                 </tr>
               ) : orders.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="text-center py-12 text-gray-400">
-                    কোনো অর্ডার পাওয়া যায়নি।
+                    No orders found.
                   </td>
                 </tr>
               ) : (

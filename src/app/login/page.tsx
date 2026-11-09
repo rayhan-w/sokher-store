@@ -31,7 +31,7 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setErrorMsg(data.error || 'লগইন ব্যর্থ হয়েছে।');
+        setErrorMsg(data.error || 'Login failed.');
         setLoading(false);
         return;
       }
@@ -44,7 +44,7 @@ export default function LoginPage() {
         router.push('/account');
       }
     } catch {
-      setErrorMsg('সার্ভারে সমস্যা দেখা দিয়েছে।');
+      setErrorMsg('Server error. Please try again.');
       setLoading(false);
     }
   };
@@ -62,7 +62,7 @@ export default function LoginPage() {
             </span>
           </Link>
           <h2 className="text-xl font-bold text-gray-900">Sign in to your account</h2>
-          <p className="text-xs text-gray-500">অ্যাকাউন্টে লগইন করে অর্ডার ট্র্যাকিং ও উইশলিস্ট দেখুন</p>
+          <p className="text-xs text-gray-500">Log in to track orders and view your wishlist</p>
         </div>
 
         {errorMsg && (
@@ -108,13 +108,13 @@ export default function LoginPage() {
             disabled={loading}
             className="w-full py-3 px-4 rounded-xl bg-[#cc272d] hover:bg-red-700 text-white font-bold text-sm shadow-md transition flex items-center justify-center gap-2 disabled:opacity-40"
           >
-            <span>{loading ? 'লগইন হচ্ছে...' : 'Sign In'}</span>
+            <span>{loading ? 'Signing in...' : 'Sign In'}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </form>
 
         <div className="text-center text-xs text-gray-500 pt-2 border-t border-gray-100">
-          অ্যাকাউন্ট নেই?{' '}
+          Don't have an account?{' '}
           <Link href="/register" className="font-bold text-[#cc272d] hover:underline">
             Register Here
           </Link>

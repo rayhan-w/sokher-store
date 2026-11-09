@@ -43,17 +43,17 @@ export default function CartPage() {
       const data = await res.json();
 
       if (!res.ok || !data.valid) {
-        setCouponError(data.error || 'ভুল বা মেয়াদোত্তীর্ণ কুপন কোড।');
+        setCouponError(data.error || 'Invalid or expired coupon code.');
       } else {
         setAppliedCoupon({
           code: data.couponCode,
           discountAmount: data.discountAmount,
         });
-        setCouponSuccess(data.message || 'কুপন সফলভাবে যোগ হয়েছে!');
+        setCouponSuccess(data.message || 'Coupon applied successfully!');
         setCouponInput('');
       }
     } catch {
-      setCouponError('কুপন যাচাই করতে সমস্যা হয়েছে।');
+      setCouponError('Unable to validate coupon.');
     } finally {
       setLoadingCoupon(false);
     }
@@ -90,9 +90,9 @@ export default function CartPage() {
             <div className="w-20 h-20 rounded-full bg-rose-50 text-[#cc272d] flex items-center justify-center mx-auto">
               <ShoppingBag className="w-10 h-10" />
             </div>
-            <h2 className="text-xl font-bold text-gray-900">আপনার শপিং কার্ট খালি রয়েছে</h2>
+            <h2 className="text-xl font-bold text-gray-900">Your shopping cart is empty</h2>
             <p className="text-xs sm:text-sm text-gray-500 max-w-sm mx-auto">
-              আপনার পছন্দের কসমেটিকস ও স্কিনকেয়ার পণ্যগুলো শপ পেইজ থেকে ব্রাউজ করে যোগ করুন।
+              Explore our premium cosmetics and skincare collection to add products to your cart.
             </p>
             <Link
               href="/shop"

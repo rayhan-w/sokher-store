@@ -47,7 +47,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   if (isLoading || !user || user.role !== 'ADMIN') {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center text-white text-xs">
-        অ্যাডমিন প্যানেল লোড হচ্ছে...
+        Loading Admin Panel...
       </div>
     );
   }

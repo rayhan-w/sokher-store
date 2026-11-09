@@ -7,7 +7,7 @@ export async function GET(request: Request) {
   try {
     const session = await getSessionUser();
     if (!session) {
-      return NextResponse.json({ error: 'লগইন করুন।' }, { status: 401 });
+      return NextResponse.json({ error: 'Please log in to continue.' }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
@@ -81,13 +81,13 @@ export async function POST(request: Request) {
     // 1. Validate Basic Customer Info
     if (!customerName || !customerPhone || !shippingAddress || !deliveryZone) {
       return NextResponse.json(
-        { error: 'নাম, মোবাইল নম্বর, পূর্ণাঙ্গ ঠিকানা এবং ডেলিভারি এলাকা নির্বাচন করুন।' },
+        { error: 'Please provide name, phone number, delivery address, and delivery zone.' },
         { status: 400 }
       );
     }
 
     if (!items || !Array.isArray(items) || items.length === 0) {
-      return NextResponse.json({ error: 'কার্টে কোনো পণ্য নেই (Cart is empty).' }, { status: 400 });
+      return NextResponse.json({ error: 'Your cart is empty.' }, { status: 400 });
     }
 
     // 2. Fetch Single Source of Truth Settings for Delivery Charges
@@ -119,12 +119,12 @@ export async function POST(request: Request) {
     for (const item of items) {
       const prod = productMap.get(item.productId);
       if (!prod) {
-        return NextResponse.json({ error: `পণ্য পাওয়া যায়নি (Product not found).` }, { status: 400 });
+        return NextResponse.json({ error: `Product not found.` }, { status: 400 });
       }
 
       if (prod.stock < item.quantity) {
         return NextResponse.json(
-          { error: `দুঃখিত, "${prod.name}" পর্যাপ্ত স্টকে নেই। বর্তমান স্টক: ${prod.stock} টি।` },
+          { error: `Sorry, "${prod.name}" does not have enough stock. Available stock: ${prod.stock}.` },
           { status: 400 }
         );
       }
@@ -246,9 +246,9 @@ export async function POST(request: Request) {
       orderNumber: order.orderNumber,
       orderId: order.id,
       totalAmount: order.totalAmount,
-      message: 'আপনার অর্ডারটি সফলভাবে গ্রহণ করা হয়েছে!',
+      message: 'Your order has been placed successfully!',
     });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message || 'অর্ডার করতে সমস্যা হয়েছে' }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Failed to place order.' }, { status: 500 });
   }
 }

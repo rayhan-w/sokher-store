@@ -54,7 +54,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     setIsCartDrawerOpen(true);
   };
 
-  // 2. Ghorer Bazar Instant "অর্ডার করুন" (1-Click Direct to Checkout)
+  // 2. Ghorer Bazar Instant "Order Now" (1-Click Direct to Checkout)
   const handleDirectOrder = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -99,16 +99,22 @@ export default function ProductCard({ product }: ProductCardProps) {
               ? 'bg-rose-50 text-[#cc272d] border border-red-200'
               : 'bg-white/80 hover:bg-white text-gray-400 hover:text-[#cc272d] border border-gray-100'
           }`}
-          aria-label="উইশলিস্ট"
-          title="পছন্দের তালিকায় রাখুন"
+          aria-label="Wishlist"
+          title="Add to Wishlist"
         >
           <Heart className={`w-3.5 h-3.5 ${isFavorite ? 'fill-[#cc272d]' : ''}`} />
         </button>
 
-        {/* Best Selling Badge on Top-Right (Exact match to screenshot) */}
+        {/* Best Selling / Discount Badge on Top-Right */}
         <span className="absolute top-2.5 right-2.5 z-10 px-2 py-0.5 rounded-lg text-[10px] font-bold bg-[#cc272d] text-white shadow-2xs flex items-center gap-1">
-          <Flame className="w-3 h-3 fill-yellow-300 text-yellow-300" />
-          <span>{product.badge || 'Best Selling'}</span>
+          {discountPercent > 0 ? (
+            <span>{discountPercent}% OFF</span>
+          ) : (
+            <>
+              <Flame className="w-3 h-3 fill-yellow-300 text-yellow-300" />
+              <span>{product.badge || 'Best Selling'}</span>
+            </>
+          )}
         </span>
 
         {/* Product Image with Hover Zoom */}
@@ -129,12 +135,12 @@ export default function ProductCard({ product }: ProductCardProps) {
       {/* Product Details Section */}
       <div className="p-3 sm:p-4 flex-1 flex flex-col justify-between">
         <div>
-          {/* Subtle Category */}
+          {/* Category Name */}
           <div className="text-[10px] font-semibold text-gray-400 mb-0.5 truncate">
             {categoryName}
           </div>
 
-          {/* Product Title (Matches screenshot) */}
+          {/* Product Title */}
           <Link href={`/product/${product.slug}`}>
             <h3 className="text-xs sm:text-sm font-bold text-gray-900 group-hover:text-[#cc272d] transition line-clamp-2 leading-snug min-h-[2.4rem]">
               {product.name}
@@ -163,7 +169,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             </span>
           </div>
 
-          {/* Price Line (Current Price, Regular Price, Discount Tag) */}
+          {/* Price Line */}
           <div className="flex items-baseline gap-2 mt-1.5 flex-wrap">
             <span className="text-sm sm:text-base font-black text-[#cc272d]">
               {formatPrice(product.price)}
@@ -181,31 +187,31 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="mt-2.5 pt-2 border-t border-gray-100 flex items-center gap-1.5 sm:gap-2">
           {product.stock > 0 ? (
             <>
-              {/* Button 1: "অর্ডার করুন" */}
+              {/* Button 1: "Order Now" */}
               <button
                 type="button"
                 onClick={handleDirectOrder}
                 className="flex-1 bg-[#cc272d] hover:bg-red-700 active:scale-95 text-white font-bold text-[11px] sm:text-xs md:text-sm py-1.5 sm:py-2 px-1.5 sm:px-2.5 rounded-lg flex items-center justify-center gap-1 shadow-xs transition"
-                title="সরাসরি অর্ডার করতে ক্লিক করুন"
+                title="Instant Checkout"
               >
                 <Zap className="w-3.5 h-3.5 fill-white flex-shrink-0" />
-                <span className="truncate">অর্ডার করুন</span>
+                <span className="truncate">Order Now</span>
               </button>
 
-              {/* Button 2: "কার্ট" */}
+              {/* Button 2: "Add to Cart" */}
               <button
                 type="button"
                 onClick={handleAddToCart}
                 className="p-1.5 sm:p-2 rounded-lg border-2 border-[#cc272d] text-[#cc272d] hover:bg-rose-50 active:scale-95 transition flex items-center justify-center flex-shrink-0"
-                aria-label="কার্টে যোগ করুন"
-                title="কার্টে রাখুন"
+                aria-label="Add to Cart"
+                title="Add to Cart"
               >
                 <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </button>
             </>
           ) : (
             <div className="w-full py-1.5 px-2 rounded-lg bg-gray-100 text-gray-400 text-[11px] sm:text-xs font-bold text-center">
-              স্টক শেষ (Out of Stock)
+              Out of Stock
             </div>
           )}
         </div>
