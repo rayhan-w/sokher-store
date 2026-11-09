@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Truck, ShieldCheck, RotateCcw, User } from 'lucide-react';
+import { Phone, MessageCircle, Truck, Package, User } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 interface AnnouncementBarProps {
@@ -10,6 +10,8 @@ interface AnnouncementBarProps {
     announcementText?: string | null;
     isAnnouncementActive?: boolean;
     freeDeliveryThreshold?: number;
+    contactPhone?: string | null;
+    whatsappNumber?: string | null;
   };
 }
 
@@ -21,43 +23,77 @@ export default function AnnouncementBar({ settings }: AnnouncementBarProps) {
   }
 
   const defaultThreshold = settings.freeDeliveryThreshold ?? 999;
-  const announcementText =
+  const hotline = settings.contactPhone || '+880 1700-000000';
+  const whatsapp = settings.whatsappNumber || '+880 1700-000000';
+  const cleanPhone = hotline.replace(/[^0-9+]/g, '');
+  const cleanWa = whatsapp.replace(/[^0-9]/g, '');
+
+  const announcement =
     settings.announcementText ||
-    `Free Shipping on orders over ৳${defaultThreshold} | 100% Authentic Products | Easy Return & Refund`;
+    `সারা দেশে দ্রুত ক্যাশ অন ডেলিভারি | ৳${defaultThreshold} বা তার বেশি অর্ডারে ফ্রি ডেলিভারি!`;
 
   return (
-    <div className="bg-[#cc272d] text-white text-xs py-2 px-4 border-b border-red-700/30">
-      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
-        <div className="flex items-center gap-6 overflow-x-auto text-[11px] sm:text-xs">
-          <span className="flex items-center gap-1.5 whitespace-nowrap">
-            <Truck className="w-3.5 h-3.5" />
-            Free Shipping on orders over ৳{defaultThreshold}
-          </span>
-          <span className="hidden md:flex items-center gap-1.5 whitespace-nowrap">
-            <ShieldCheck className="w-3.5 h-3.5" />
-            100% Authentic Products
-          </span>
-          <span className="hidden lg:flex items-center gap-1.5 whitespace-nowrap">
-            <RotateCcw className="w-3.5 h-3.5" />
-            Easy Return & Refund
-          </span>
+    <div className="bg-[#b91c1c] text-white text-xs py-1.5 px-3 sm:px-6 border-b border-red-800/40 select-none">
+      <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 text-[11px] sm:text-xs">
+        {/* Left: Hotline & WhatsApp (Ghorer Bazar Style) */}
+        <div className="flex items-center gap-3 sm:gap-5 flex-shrink-0">
+          <a
+            href={`tel:${cleanPhone}`}
+            className="flex items-center gap-1.5 font-medium hover:text-rose-200 transition"
+            title="হটলাইনে কল করুন"
+          >
+            <Phone className="w-3.5 h-3.5 text-yellow-300 animate-pulse" />
+            <span>
+              হটলাইন: <strong className="font-bold">{hotline}</strong>
+            </span>
+          </a>
+
+          <a
+            href={`https://wa.me/${cleanWa}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden md:flex items-center gap-1 hover:text-emerald-300 transition"
+            title="WhatsApp-এ যোগাযোগ করুন"
+          >
+            <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="font-medium">WhatsApp</span>
+          </a>
         </div>
 
-        <div className="flex items-center gap-4 text-[11px] sm:text-xs font-medium">
+        {/* Center: Offer & Delivery Ticker */}
+        <div className="hidden lg:flex items-center justify-center gap-2 text-rose-100 flex-1 truncate px-4">
+          <Truck className="w-3.5 h-3.5 text-yellow-300 flex-shrink-0" />
+          <span className="truncate font-medium">{announcement}</span>
+        </div>
+
+        {/* Right: Track Order & User Auth */}
+        <div className="flex items-center gap-3 sm:gap-4 font-medium flex-shrink-0">
+          <Link
+            href="/account"
+            className="flex items-center gap-1 text-rose-100 hover:text-white transition"
+          >
+            <Package className="w-3.5 h-3.5 text-yellow-300" />
+            <span className="hidden sm:inline">অর্ডার ট্র্যাক</span>
+          </Link>
+
+          <span className="text-red-400">|</span>
+
           {user ? (
-            <div className="flex items-center gap-2">
+            <Link
+              href={user.role === 'ADMIN' ? '/admin' : '/account'}
+              className="flex items-center gap-1 hover:text-rose-200 transition"
+            >
               <User className="w-3.5 h-3.5" />
-              <Link href={user.role === 'ADMIN' ? '/admin' : '/account'} className="hover:underline">
-                {user.name} ({user.role === 'ADMIN' ? 'Admin Panel' : 'My Account'})
-              </Link>
-            </div>
+              <span className="max-w-[100px] truncate">{user.name}</span>
+            </Link>
           ) : (
-            <div className="flex items-center gap-2">
+            <Link
+              href="/login"
+              className="flex items-center gap-1 hover:text-rose-200 transition"
+            >
               <User className="w-3.5 h-3.5" />
-              <Link href="/login" className="hover:underline">
-                Login / Register
-              </Link>
-            </div>
+              <span>লগইন / রেজিস্টার</span>
+            </Link>
           )}
         </div>
       </div>

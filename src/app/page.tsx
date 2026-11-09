@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Sparkles } from 'lucide-react';
 import prisma from '@/lib/prisma';
 import AnnouncementBar from '@/components/AnnouncementBar';
 import Header from '@/components/Header';
@@ -33,7 +33,7 @@ export default async function HomePage() {
         isFeatured: true,
       },
       orderBy: { createdAt: 'desc' },
-      take: 10,
+      take: 12,
       include: {
         categories: { include: { category: true } },
         reviews: { select: { rating: true } },
@@ -65,9 +65,12 @@ export default async function HomePage() {
     storeName: 'Sokher Store',
     tagline: 'Your Beauty, Our Passion',
     logoUrl: '/images/logo-icon.jpg',
-    announcementText: 'Free Shipping on orders over ৳999 | 100% Authentic Products',
+    announcementText: 'সারা দেশে দ্রুত ক্যাশ অন ডেলিভারি | ৳৯৯৯ বা তার বেশি অর্ডারে ফ্রি ডেলিভারি!',
     isAnnouncementActive: true,
     freeDeliveryThreshold: 999,
+    contactPhone: '+880 1700-000000',
+    contactEmail: 'support@sokherstore.com',
+    whatsappNumber: '+880 1700-000000',
     trustBarItems: null,
   };
 
@@ -85,9 +88,10 @@ export default async function HomePage() {
 
   const formattedFeaturedProducts = featuredProducts.map((p) => {
     const totalRatings = p.reviews.length;
-    const avgRating = totalRatings > 0
-      ? Math.round((p.reviews.reduce((acc, r) => acc + r.rating, 0) / totalRatings) * 10) / 10
-      : 4.8;
+    const avgRating =
+      totalRatings > 0
+        ? Math.round((p.reviews.reduce((acc, r) => acc + r.rating, 0) / totalRatings) * 10) / 10
+        : 4.8;
 
     return {
       id: p.id,
@@ -106,48 +110,58 @@ export default async function HomePage() {
   });
 
   return (
-    <main className="min-h-screen bg-[#FFFDFD]">
-      {/* 1. Announcement Bar */}
-      <AnnouncementBar settings={defaultSettings} />
+    <main className="min-h-screen bg-[#FFFDFD] pb-12 sm:pb-0">
+      {/* 1. Announcement Bar (Top Hotline & Notification) */}
+      <AnnouncementBar settings={defaultSettings as any} />
 
-      {/* 2. Main Header */}
-      <Header settings={defaultSettings} categories={formattedCategories} />
+      {/* 2. Main 2-Tier Header (Ghorer Bazar Style) */}
+      <Header settings={defaultSettings as any} categories={formattedCategories} />
 
       {/* 3. Hero Slider */}
       <HeroSlider slides={heroSlides} />
 
-      {/* 4. Trust Bar */}
-      <TrustBar items={(defaultSettings as any).trustBarItems ? JSON.parse((defaultSettings as any).trustBarItems) : null} />
+      {/* 4. Trust Assurance Bar */}
+      <TrustBar
+        items={
+          (defaultSettings as any).trustBarItems
+            ? JSON.parse((defaultSettings as any).trustBarItems)
+            : null
+        }
+      />
 
-      {/* 5. Shop by Category */}
+      {/* 5. Shop by Category (Ghorer Bazar Category Cards) */}
       <CategoryCircles categories={formattedCategories} />
 
-      {/* 6. Featured Products (Reference UI Match) */}
+      {/* 6. Flash Sale (if active) */}
+      {activeFlashSale && <FlashSaleSection flashSale={activeFlashSale} />}
+
+      {/* 7. Featured Products (Ghorer Bazar Grid & 1-Click Order Cards) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-end justify-between mb-8 border-b border-gray-200 pb-4">
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
-              Featured Products
+            <div className="flex items-center gap-1.5 text-xs font-bold text-[#cc272d] uppercase tracking-wider mb-1">
+              <Sparkles className="w-4 h-4" />
+              <span>সেরা পণ্য সংগ্রহ</span>
+            </div>
+            <h2 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">
+              জনপ্রিয় ও ফিচার্ড পণ্যসমূহ
             </h2>
-            <p className="text-xs sm:text-sm text-gray-500 mt-1">
-              Best selling products just for you
-            </p>
           </div>
           <Link
             href="/shop"
-            className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-[#cc272d] hover:text-red-700 hover:underline"
+            className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#cc272d] hover:text-red-700 hover:underline"
           >
-            View All Products
-            <ArrowRight className="w-3.5 h-3.5" />
+            <span>সকল পণ্য দেখুন</span>
+            <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 
         {formattedFeaturedProducts.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center text-gray-500">
-            বর্তমানে কোনো ফিচারড পণ্য নেই।
+          <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center text-gray-500">
+            বর্তমানে কোনো পণ্য নেই।
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-6">
             {formattedFeaturedProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
@@ -155,13 +169,10 @@ export default async function HomePage() {
         )}
       </section>
 
-      {/* 7. Flash Sale (if active) */}
-      {activeFlashSale && <FlashSaleSection flashSale={activeFlashSale} />}
-
       {/* 8. Promotional Banner ("Glow Naturally") */}
       <PromoBanner banner={promoBanner} />
 
-      {/* 9. Footer */}
+      {/* 9. Footer (Ghorer Bazar Multi-Column Footer) */}
       <Footer settings={defaultSettings as any} />
     </main>
   );

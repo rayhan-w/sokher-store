@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, LayoutGrid } from 'lucide-react';
 
 interface CategoryItem {
   id: string;
@@ -21,32 +21,38 @@ export default function CategoryCircles({ categories = [] }: CategoryCirclesProp
   if (!categories || categories.length === 0) return null;
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="flex items-center justify-between mb-8">
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+      {/* Section Header (Ghorer Bazar Style) */}
+      <div className="flex items-end justify-between mb-8 border-b border-gray-200 pb-4">
         <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
-            Shop by Category
+          <div className="flex items-center gap-2 text-xs font-bold text-[#cc272d] uppercase tracking-wider mb-1">
+            <LayoutGrid className="w-4 h-4" />
+            <span>জনপ্রিয় ক্যাটাগরি সমূহ</span>
+          </div>
+          <h2 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">
+            ক্যাটাগরি অনুযায়ী শপ করুন
           </h2>
-          <p className="text-xs sm:text-sm text-gray-500 mt-1">Explore our wide range of cosmetics & beauty care</p>
         </div>
         <Link
           href="/shop"
-          className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-[#cc272d] hover:text-red-700 hover:underline"
+          className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#cc272d] hover:text-red-700 hover:underline"
         >
-          View All Categories
-          <ArrowRight className="w-3.5 h-3.5" />
+          <span>সব ক্যাটাগরি</span>
+          <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
 
-      <div className="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-8 gap-4 sm:gap-6 text-center">
+      {/* Categories Grid (Clean Rounded Bordered Cards) */}
+      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 sm:gap-5 text-center">
         {categories.map((cat) => (
           <Link
             key={cat.id}
             href={`/category/${cat.slug}`}
-            className="group flex flex-col items-center focus:outline-none"
+            className="group flex flex-col items-center p-3 rounded-2xl bg-white border border-gray-200 hover:border-[#cc272d] hover:shadow-lg transition-all duration-300"
           >
-            <div className="relative w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full p-1 bg-gradient-to-tr from-rose-200 via-rose-100 to-white shadow-md group-hover:shadow-rose-400/30 group-hover:scale-105 transition-all duration-300">
-              <div className="relative w-full h-full rounded-full overflow-hidden bg-rose-50 flex items-center justify-center">
+            {/* Image Circle Container */}
+            <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full p-1 bg-rose-50 border border-red-100 group-hover:scale-105 group-hover:bg-[#cc272d]/10 transition-all duration-300">
+              <div className="relative w-full h-full rounded-full overflow-hidden bg-white flex items-center justify-center">
                 {cat.image ? (
                   <Image
                     src={cat.image}
@@ -55,12 +61,21 @@ export default function CategoryCircles({ categories = [] }: CategoryCirclesProp
                     className="object-cover group-hover:scale-110 transition-transform duration-500"
                   />
                 ) : (
-                  <span className="text-lg font-bold text-[#cc272d]">{cat.name.charAt(0)}</span>
+                  <span className="text-lg font-black text-[#cc272d]">
+                    {cat.name.charAt(0)}
+                  </span>
                 )}
               </div>
             </div>
-            <span className="mt-2.5 text-xs sm:text-sm font-semibold text-gray-800 group-hover:text-[#cc272d] transition line-clamp-1">
+
+            {/* Category Name */}
+            <span className="mt-3 text-xs sm:text-sm font-bold text-gray-800 group-hover:text-[#cc272d] transition line-clamp-1">
               {cat.name}
+            </span>
+
+            {/* Product Count or View */}
+            <span className="text-[10px] text-gray-400 mt-0.5 group-hover:text-gray-600 transition">
+              {cat.productCount ? `${cat.productCount} টি পণ্য` : 'পণ্য দেখুন'}
             </span>
           </Link>
         ))}
