@@ -67,7 +67,7 @@ export default async function HomePage() {
     tagline: 'Your Beauty, Our Passion',
     logoUrl: '/images/logo-icon.jpg',
     announcementText: 'Fast Cash on Delivery all over Bangladesh | Free Shipping on orders over ৳999!',
-    isAnnouncementActive: true,
+    isAnnouncementActive: false,
     freeDeliveryThreshold: 999,
     contactPhone: '+880 1700-000000',
     contactEmail: 'support@sokherstore.com',
@@ -118,8 +118,8 @@ export default async function HomePage() {
       {/* 2. Header (Clean mobile view: [☰]  [SOKHER STORE]  [🛒 0]) */}
       <Header settings={defaultSettings as any} categories={formattedCategories} />
 
-      {/* 3. Hero Banner Slider (16:9 on mobile with pagination dots) */}
-      <HeroSlider slides={heroSlides} />
+      {/* 3. Hero Banner Slider (2-column on desktop with promo card, 16:9 on mobile) */}
+      <HeroSlider slides={heroSlides} promoBanner={promoBanner} />
 
       {/* 4. Featured Categories (Squircle cards with arrow) */}
       <CategoryCircles categories={formattedCategories} />
@@ -159,8 +159,10 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 8. Promotional Banner */}
-      <PromoBanner banner={promoBanner} />
+      {/* 8. Promotional Banner (Mobile only, desktop has it beside hero slider) */}
+      <div className="lg:hidden">
+        <PromoBanner banner={promoBanner} />
+      </div>
 
       {/* 9. Trust & Assurance Bar */}
       <div className="py-6 sm:py-10">

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface Slide {
   id: string;
@@ -14,11 +15,22 @@ interface Slide {
   imageUrl: string;
 }
 
-interface HeroSliderProps {
-  slides?: Slide[];
+interface PromoBannerItem {
+  id?: string;
+  title?: string | null;
+  subtitle?: string | null;
+  badge?: string | null;
+  buttonText?: string | null;
+  buttonUrl?: string | null;
+  imageUrl?: string | null;
 }
 
-export default function HeroSlider({ slides = [] }: HeroSliderProps) {
+interface HeroSliderProps {
+  slides?: Slide[];
+  promoBanner?: PromoBannerItem | null;
+}
+
+export default function HeroSlider({ slides = [], promoBanner }: HeroSliderProps) {
   const [currentIdx, setCurrentIdx] = useState(0);
 
   const displaySlides: Slide[] =
@@ -39,6 +51,12 @@ export default function HeroSlider({ slides = [] }: HeroSliderProps) {
           },
         ];
 
+  const defaultPromo: PromoBannerItem = promoBanner || {
+    buttonUrl: '/shop',
+    imageUrl:
+      'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=800&auto=format&fit=crop&q=80',
+  };
+
   useEffect(() => {
     if (displaySlides.length <= 1) return;
     const interval = setInterval(() => {
@@ -49,37 +67,84 @@ export default function HeroSlider({ slides = [] }: HeroSliderProps) {
 
   const slide = displaySlides[currentIdx] || displaySlides[0];
 
-  return (
-    <section className="max-w-7xl mx-auto px-3 sm:px-6 pt-2.5 pb-2">
-      {/* Exact Match to User Screenshot: aspect-[16/9] Image Banner Card */}
-      <div className="relative w-full aspect-[16/9] sm:aspect-[2.4/1] md:aspect-[3/1] rounded-2xl overflow-hidden shadow-xs border border-gray-100 bg-gray-50">
-        <Link href={slide.buttonUrl || '/shop'} className="block w-full h-full relative">
-          <Image
-            src={slide.imageUrl}
-            alt={slide.title || 'Sokher Store Promotion'}
-            fill
-            priority
-            className="object-cover object-center"
-          />
-        </Link>
+  const prevSlide = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setCurrentIdx((prev) => (prev - 1 + displaySlides.length) % displaySlides.length);
+  };
 
-        {/* Bottom-Left Dots Indicator */}
-        {displaySlides.length > 1 && (
-          <div className="absolute bottom-3 left-4 flex items-center gap-1.5 z-20">
-            {displaySlides.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrentIdx(i)}
-                className={`h-2 rounded-full transition-all duration-300 ${
-                  i === currentIdx
-                    ? 'w-5 bg-[#cc272d]'
-                    : 'w-2 bg-white/80 hover:bg-white shadow-xs'
-                }`}
-                aria-label={`Slide ${i + 1}`}
-              />
-            ))}
-          </div>
-        )}
+  const nextSlide = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setCurrentIdx((prev) => (prev + 1) % displaySlides.length);
+  };
+
+  return (
+    <section className="max-w-7xl mx-auto px-3 sm:px-6 pt-3 pb-2">
+      {/* 2-Column Banner Grid matching Ghorer Bazar Desktop View */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+        {/* Left Column: Main Banner Carousel */}
+        <div className="lg:col-span-8 relative w-full aspect-[16/9] lg:aspect-[2.15/1] rounded-2xl overflow-hidden shadow-xs border border-gray-100 bg-gray-50 group">
+          <Link href={slide.buttonUrl || '/shop'} className="block w-full h-full relative">
+            <Image
+              src={slide.imageUrl}
+              alt={slide.title || 'Sokher Store Promotion'}
+              fill
+              priority
+              className="object-cover object-center"
+            />
+          </Link>
+
+          {/* Left Arrow Button */}
+          {displaySlides.length > 1 && (
+            <button
+              onClick={prevSlide}
+              className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white/90 hover:bg-white text-gray-700 shadow-md flex items-center justify-center transition active:scale-95 opacity-80 group-hover:opacity-100"
+              aria-label="Previous slide"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+          )}
+
+          {/* Right Arrow Button */}
+          {displaySlides.length > 1 && (
+            <button
+              onClick={nextSlide}
+              className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white/90 hover:bg-white text-gray-700 shadow-md flex items-center justify-center transition active:scale-95 opacity-80 group-hover:opacity-100"
+              aria-label="Next slide"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          )}
+
+          {/* Bottom-Left Dots Indicator */}
+          {displaySlides.length > 1 && (
+            <div className="absolute bottom-3 left-4 flex items-center gap-1.5 z-20">
+              {displaySlides.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentIdx(i)}
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    i === currentIdx
+                      ? 'w-5 bg-[#cc272d]'
+                      : 'w-2 bg-white/80 hover:bg-white shadow-xs'
+                  }`}
+                  aria-label={`Slide ${i + 1}`}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Right Column (Desktop Only): Side Promotional Banner Card */}
+        <div className="hidden lg:block lg:col-span-4 relative rounded-2xl overflow-hidden shadow-xs border border-gray-100 bg-gray-50 group">
+          <Link href={defaultPromo.buttonUrl || '/shop'} className="block w-full h-full relative min-h-[220px]">
+            <Image
+              src={defaultPromo.imageUrl || 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=800&auto=format&fit=crop&q=80'}
+              alt={defaultPromo.title || 'Special Promotion'}
+              fill
+              className="object-cover object-center group-hover:scale-103 transition-transform duration-500"
+            />
+          </Link>
+        </div>
       </div>
     </section>
   );

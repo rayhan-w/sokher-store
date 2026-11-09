@@ -88,6 +88,15 @@ export default function CategoryCircles({ categories = [] }: CategoryCirclesProp
             </Link>
           ))}
         </div>
+
+        {/* Right Arrow Button */}
+        <button
+          onClick={scrollRight}
+          className="absolute -right-1 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-[#cc272d] text-white flex items-center justify-center shadow-md hover:bg-red-700 active:scale-95 transition"
+          aria-label="Scroll right"
+        >
+          <ChevronRight className="w-5 h-5" />
+        </button>
       </div>
     </section>
   );
